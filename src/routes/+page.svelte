@@ -1,7 +1,16 @@
-<script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+<script lang="ts">
+	import Login from "./pages/login.svelte";
+	import Loading from "./pages/loading.svelte";
+	import Dashboard from "./pages/dashboard/index.svelte";
+
+	console.log("page.svelte===================start");
+	import { activeSession, appReady } from "$lib/app/store";
+
+	$: needLogin = $activeSession === undefined;
+
+	import { onMount } from "svelte";
+
+	onMount(() => {});
 </script>
 
 <svelte:head>
@@ -10,22 +19,13 @@
 </svelte:head>
 
 <section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
+	{#if !$appReady}
+		<Loading />
+	{:else if needLogin}
+		<Login />
+	{:else}
+		<Dashboard />
+	{/if}
 </section>
 
 <style>
