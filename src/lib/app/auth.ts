@@ -41,3 +41,17 @@ export async function init() {
     }
     console.log("auth.ts==============================finish")
 }
+
+export async function login() {
+    console.log('auth.ts---start')
+    // const result = await link.login(appId)
+    // console.log(`auth.ts---result: ${result}`)
+    // if (result.account) {
+    //     // populate account cache with the account returned by login so we don't need to re-fetch it
+    //     storeAccount(result.account, result.session.chainId)
+    // }
+    // const list = await link.listSessions(appId)
+    // availableSessions.set(list)
+    // activeSession.set(result.session)
+    console.log('auth.ts---finish')
+}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Login from "./pages/login.svelte";
+	import Login from "./pages/login/login.svelte";
 	import Loading from "./pages/loading.svelte";
 	import Dashboard from "./pages/dashboard/index.svelte";
 
@@ -18,7 +18,7 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<section>
+<main>
 	{#if !$appReady}
 		<Loading />
 	{:else if needLogin}
@@ -26,34 +26,10 @@
 	{:else}
 		<Dashboard />
 	{/if}
-</section>
+</main>
 
 <style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
+	main {
+		min-height: 100vh;
 	}
 </style>

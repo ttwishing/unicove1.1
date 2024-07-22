@@ -1,4 +1,4 @@
-<div class="app-loading">loading</div>
+<div class="app-loading"></div>
 
 <style lang="scss" global>
     // Styles are global since we also depend on them _before_ the app has loaded.
