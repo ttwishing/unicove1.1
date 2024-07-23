@@ -3,11 +3,12 @@ import { ChainId, SigningRequest } from '@wharfkit/signing-request'
 
 
 import { Link } from "$lib/anchor-link/link"
-import { BrowserTransport } from '$lib/anchor-link-browser-transport'
+import Transport from '$lib/anchor-link-browser-transport'
 
 import { appId, chains } from './config'
 import { getClient } from './api-client'
 import { activeSession, availableSessions } from './store'
+import { storeAccount } from '$lib/stores/account-provider';
 
 export interface SessionLike {
     auth: PermissionLevel
@@ -18,7 +19,7 @@ function sleep(delay: number) {
     return new Promise((resolve) => setTimeout(resolve, delay))
 }
 
-const transport = new BrowserTransport({
+const transport = new Transport({
     requestStatus: false,
 })
 
@@ -44,14 +45,14 @@ export async function init() {
 
 export async function login() {
     console.log('auth.ts---start')
-    // const result = await link.login(appId)
-    // console.log(`auth.ts---result: ${result}`)
-    // if (result.account) {
-    //     // populate account cache with the account returned by login so we don't need to re-fetch it
-    //     storeAccount(result.account, result.session.chainId)
-    // }
-    // const list = await link.listSessions(appId)
-    // availableSessions.set(list)
-    // activeSession.set(result.session)
+    const result = await link.login(appId)
+    console.log(`auth.ts---result: ${result}`)
+    if (result.account) {
+        // populate account cache with the account returned by login so we don't need to re-fetch it
+        storeAccount(result.account, result.session.chainId)
+    }
+    const list = await link.listSessions(appId)
+    availableSessions.set(list)
+    activeSession.set(result.session)
     console.log('auth.ts---finish')
 }

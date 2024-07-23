@@ -1,10 +1,10 @@
 import { init as initAuth } from './auth'
+import { Preferences } from './preferences'
 import { appReady } from './store'
-
 
 async function init() {
     try {
-        await Promise.all([initAuth()])
+        await Promise.all([initAuth(), Preferences.shared.initStorage()])
     } catch (error) {
         console.log("main.ts===error: ", error)
         console.warn('Error when initializing Anchor Link', error)

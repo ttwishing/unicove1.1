@@ -64,7 +64,9 @@ class BuoyCallback implements LinkCallback {
  * @internal
  */
 function waitForCallback(url: string, ctx: { cancel?: () => void }) {
+    console.log("sendRequest*******waitForCallback")
     return new Promise<LinkCallbackResponse>((resolve, reject) => {
+        console.log("sendRequest*******waitForCallback_running")
         let active = true
         let retries = 0
         const socketUrl = url.replace(/^http/, 'ws')
@@ -76,9 +78,12 @@ function waitForCallback(url: string, ctx: { cancel?: () => void }) {
                 reject(error)
             }
         }
+        console.log("waitForCallback......1")
         const connect = () => {
+            console.log("connect...connect")
             const socket = new WebSocket(socketUrl)
             ctx.cancel = () => {
+                console.log("connect#cancel")
                 active = false
                 if (
                     socket.readyState === WebSocket.OPEN ||
@@ -88,11 +93,13 @@ function waitForCallback(url: string, ctx: { cancel?: () => void }) {
                 }
             }
             socket.onmessage = (event: any) => {
+                console.log("connect#onmessage")
                 active = false
                 if (socket.readyState === WebSocket.OPEN) {
                     socket.close()
                 }
                 if (typeof Blob !== 'undefined' && event.data instanceof Blob) {
+                    console.log("connect#onmessage_0")
                     const reader = new FileReader()
                     reader.onload = () => {
                         handleResponse(reader.result as string)
@@ -103,22 +110,28 @@ function waitForCallback(url: string, ctx: { cancel?: () => void }) {
                     reader.readAsText(event.data)
                 } else {
                     if (typeof event.data === 'string') {
+                        console.log("connect#onmessage_1")
                         handleResponse(event.data)
                     } else {
+                        console.log("connect#onmessage_2")
                         handleResponse(event.data.toString())
                     }
                 }
             }
             socket.onopen = () => {
+                console.log("connect#onopen")
                 retries = 0
             }
             socket.onclose = () => {
+                console.log("connect#onclose")
                 if (active) {
                     setTimeout(connect, backoff(retries++))
                 }
             }
         }
+        console.log("waitForCallback......2")
         connect()
+        console.log("waitForCallback......finish")
     })
 }
 

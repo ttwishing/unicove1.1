@@ -2,7 +2,7 @@ import type { APIClient } from '@wharfkit/antelope'
 import type { ChainIdType } from '@wharfkit/signing-request'
 
 import type { LinkCallbackService } from './link-callback'
-import type { LinkChain } from './link-chain'
+import type { LinkChain } from './link'
 import type { LinkStorage } from './link-storage'
 import type { LinkTransport } from './link-transport'
 
@@ -83,3 +83,12 @@ export interface LinkOptions {
     encodeChainIds?: boolean
 }
 
+/** @internal */
+export namespace LinkOptions {
+    /** @internal */
+    export const defaults = {
+        service: 'https://cb.anchor.link',
+        verifyProofs: false,
+        encodeChainIds: true,
+    }
+}

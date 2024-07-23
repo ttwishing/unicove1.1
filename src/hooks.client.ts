@@ -1,5 +1,4 @@
-import type { Handle } from '@sveltejs/kit'
-
+console.log("hooks.clent=============================start")
 import { initApp } from '$lib/app/main'
 
 initApp()
