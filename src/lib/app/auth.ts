@@ -31,12 +31,12 @@ const link = new Link({
 
 export async function init() {
     console.log("auth.ts==============================start")
-    await sleep(1000)
     console.log("auth.ts, localStorage = ", localStorage)
     const list = await link.listSessions(appId)
     console.log("auth.ts, listSessions = ", list)
     let session = await link.restoreSession(appId)
     availableSessions.set(list)
+    console.log("auth.ts======1")
     if (session) {
         activeSession.set(session)
     }
@@ -55,4 +55,18 @@ export async function login() {
     availableSessions.set(list)
     activeSession.set(result.session)
     console.log('auth.ts---finish')
+}
+
+export async function activate(id: SessionLike) {
+    // const session = await link.restoreSession(appId, id.auth, id.chainId)
+    // if (!session) {
+    //     throw new Error('No such session')
+    // }
+    // activeSession.set(session)
+
+    // if (get(activeEvmSession)) {
+    //     activeEvmSession.set(undefined)
+    //     await startEvmSession()
+    //     fetchBalances(get(activeSession), true)
+    // }
 }
