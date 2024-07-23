@@ -63,7 +63,7 @@ class BuoyCallback implements LinkCallback {
  * Connect to a WebSocket channel and wait for a message.
  * @internal
  */
-function waitForCallback(url: string, ctx: { cancel?: () => void }) {
+function waitForCallback(url: string, ctx: { cancel?: () => void }): Promise<LinkCallbackResponse> {
     console.log("sendRequest*******waitForCallback")
     return new Promise<LinkCallbackResponse>((resolve, reject) => {
         console.log("sendRequest*******waitForCallback_running")
@@ -72,6 +72,7 @@ function waitForCallback(url: string, ctx: { cancel?: () => void }) {
         const socketUrl = url.replace(/^http/, 'ws')
         const handleResponse = (response: string) => {
             try {
+                console.log("connect#handleResponse", response)
                 resolve(JSON.parse(response))
             } catch (error: any) {
                 error.message = 'Unable to parse callback JSON: ' + error.message
@@ -93,7 +94,7 @@ function waitForCallback(url: string, ctx: { cancel?: () => void }) {
                 }
             }
             socket.onmessage = (event: any) => {
-                console.log("connect#onmessage")
+                console.log("connect#onmessage", event)
                 active = false
                 if (socket.readyState === WebSocket.OPEN) {
                     socket.close()
