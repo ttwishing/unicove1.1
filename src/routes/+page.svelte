@@ -3,7 +3,6 @@
 	import Loading from "./pages/loading.svelte";
 	import Dashboard from "./pages/dashboard/index.svelte";
 
-	console.log("page.svelte===================start");
 	import { activeSession, appReady } from "$lib/app/store";
 
 	$: needLogin = $activeSession === undefined;

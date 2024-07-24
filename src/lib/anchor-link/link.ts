@@ -350,23 +350,18 @@ export class Link {
     ) {
         const t = transport || this.transport
         try {
-            console.log("link#sendRequest=============================")
             const linkUrl = request.data.callback
             if (linkUrl !== callback.url) {
                 throw new Error('Invalid request callback')
             }
-            console.log("link#sendRequest, linkUrl:", linkUrl)
             if (request.data.flags.broadcast === true || request.data.flags.background === false) {
                 throw new Error('Invalid request flags')
             }
 
-            console.log("link#sendRequest>>>>>>>>>>>>>>>>>>>>>>>>>>>race")
             // wait for callback or user cancel
             let done = false
             const cancel = new Promise<never>((resolve, reject) => {
-                console.log("link#sendRequest>>>onRequest")
                 t.onRequest(request, (reason) => {
-                    console.log("link#sendRequest>>>onCancel")
                     if (done) {
                         // ignore any cancel calls once callbackResponse below has resolved
                         return
@@ -381,7 +376,6 @@ export class Link {
                 })
             })
             const callbackResponse = await Promise.race([callback.wait(), cancel])
-            console.log("link#sendRequest, callbackResponse: ", callbackResponse)
             done = true
             if (typeof callbackResponse.rejected === 'string') {
                 throw new CancelError(callbackResponse.rejected)
@@ -391,15 +385,9 @@ export class Link {
                 actor: payload.sa,
                 permission: payload.sp,
             })
-            console.log("link#sendRequest, signer: ", signer)
             const signatures: Signature[] = Object.keys(payload)
                 .filter((key) => key.startsWith('sig') && key !== 'sig0')
                 .map((key) => Signature.from(payload[key]!))
-            console.log("link#sendRequest, signatures: ", signatures)
-
-            console.log("link#sendRequest, chain: ", chain)
-            console.log("link#sendRequest, this.chains: ", this.chains)
-
             let c: LinkChain
             if (!chain && this.chains.length > 1) {
                 if (!payload.cid) {
@@ -414,24 +402,20 @@ export class Link {
                     throw new Error('Got response for wrong chain id')
                 }
             }
-            console.log("link#sendRequest, c: ", c)
             // recreate transaction from request response
             const resolved = await ResolvedSigningRequest.fromPayload(payload, {
                 zlib,
                 abiProvider: c,
             })
-            console.log("link#sendRequest, resolved: ", resolved)
             // prepend cosigner signature if present
             const cosignerSig = resolved.request.getInfoKey('cosig', {
                 type: Signature,
                 array: true,
             }) as Signature[] | undefined
 
-            console.log("link#sendRequest, cosignerSig: ", cosignerSig)
             if (cosignerSig) {
                 signatures.unshift(...cosignerSig)
             }
-            console.log("link#sendRequest, cosignerSig: ", cosignerSig)
             const result: TransactResult = {
                 resolved,
                 chain: c,
@@ -441,7 +425,6 @@ export class Link {
                 payload,
                 signer,
             }
-            console.log("link#sendRequest, broadcast: ", broadcast)
             if (broadcast) {
                 const signedTx = SignedTransaction.from({
                     ...resolved.transaction,
@@ -455,7 +438,6 @@ export class Link {
             }
             return result
         } catch (error) {
-            console.log("link#sendRequest>>>", error)
             if (t.onFailure) {
                 t.onFailure(request, error)
             }
@@ -538,8 +520,6 @@ export class Link {
             info: args.info,
         })
         const res = await this.sendRequest(request, callback)
-        console.log("========identify ==========")
-        console.log("identify, sendRequest_result: ", res)
         if (!res.resolved.request.isIdentity()) {
             throw new IdentityError('Unexpected response')
         }
@@ -570,7 +550,6 @@ export class Link {
 
         if (args.requestPermission) {
             const perm = PermissionLevel.from(args.requestPermission)
-            console.log("identify, perm: ", perm)
             if (
                 (!perm.actor.equals(PlaceholderName) && !perm.actor.equals(proof.signer.actor)) ||
                 (!perm.permission.equals(PlaceholderPermission) &&
@@ -594,7 +573,6 @@ export class Link {
      *                   Should be set to the contract account if applicable.
      */
     public async login(identifier: NameType): Promise<LoginResult> {
-        console.log("login==========================", identifier)
         const privateKey = PrivateKey.generate('K1')
         const requestKey = privateKey.toPublic()
         const createInfo = LinkCreate.from({
@@ -602,7 +580,6 @@ export class Link {
             request_key: requestKey,
             user_agent: this.getUserAgent(),
         })
-        console.log("login, createInfo: ", createInfo)
 
         const res = await this.identify({
             scope: identifier,
@@ -611,12 +588,8 @@ export class Link {
                 scope: identifier,
             },
         })
-        console.log("========login ==========")
-        console.log("login, identify_result: ", res)
         const metadata = sessionMetadata(res.payload, res.resolved.request)
-        console.log("login, metadata: ", metadata)
         const signerKey = res.proof.recover()
-        console.log("login, signerKey: ", signerKey)
         let session: LinkSession
         if (res.payload.link_ch && res.payload.link_key && res.payload.link_name) {
             session = new LinkChannelSession(

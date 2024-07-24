@@ -22,7 +22,6 @@ const initialAccountResponse: AccountResponse = {
 
 export const accountProvider: Writable<AccountResponse> = writable(initialAccountResponse, () => {
     // Update on a set interval
-    console.log("account-provider.ts==================================accountProvider", activeSession)
     const interval = setInterval(() => {
         const session = get(activeSession)
         if (session) {
@@ -44,7 +43,6 @@ export const accountProvider: Writable<AccountResponse> = writable(initialAccoun
 })
 
 export async function updateAccount(portal: string, name: Name, chainId: ChainId, refresh: boolean = false) {
-    console.log("account-provider.ts==================================updateAccount: ", portal)
     isLoading.set(true)
     loadAccount(
         name,
@@ -66,7 +64,6 @@ export async function updateAccount(portal: string, name: Name, chainId: ChainId
 }
 
 export function updateActiveAccount() {
-    console.log("account-provider.ts==================================updateActiveAccount")
     const session = get(activeSession)
     if (!session) return
     updateAccount(session.auth.actor, session.chainId)

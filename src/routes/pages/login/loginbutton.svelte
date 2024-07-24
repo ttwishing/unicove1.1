@@ -18,11 +18,9 @@
         disabled = true;
         login()
             .catch((err) => {
-                console.log("loginHander, cache");
                 addToast({ title: "Unable to login", message: err.message });
             })
             .finally(() => {
-                console.log("loginHander, finnal");
                 disabled = false;
             });
     }

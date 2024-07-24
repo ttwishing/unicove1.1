@@ -26,16 +26,16 @@
         }
         &.image {
             background-size: cover;
-            background-image: url("/images/unicove-bright-mode-card-1.jpeg");
+            // background-image: url("/images/unicove-bright-mode-card-1.jpeg");
             :global(.darkmode) & {
-                background-image: url("/images/unicove-dark-mode-card-1.jpeg");
+                // background-image: url("/images/unicove-dark-mode-card-1.jpeg");
             }
         }
         &.image-alt {
             background-size: cover;
-            background-image: url("/images/unicove-bright-mode-card-2.jpeg");
+            // background-image: url("/images/unicove-bright-mode-card-2.jpeg");
             :global(.darkmode) & {
-                background-image: url("/images/unicove-dark-mode-card-2.jpeg");
+                // background-image: url("/images/unicove-dark-mode-card-2.jpeg");
             }
         }
         &.bordered {

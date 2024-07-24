@@ -3,7 +3,6 @@ import { openDB } from 'idb'
 import { readable, ReadableResult } from 'svelte-result-store'
 
 const dbVersion = 3
-console.log("db.ts>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>0")
 interface WalletDB extends DBSchema {
     'account-cache': {
         key: string // <chain_id>-<account_name>
@@ -31,7 +30,6 @@ interface WalletDB extends DBSchema {
     }
 }
 
-console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>1")
 export const dbPromise = openDB<WalletDB>('wallet', dbVersion, {
     upgrade(db, version) {
         if (version < 1) {
@@ -48,7 +46,6 @@ export const dbPromise = openDB<WalletDB>('wallet', dbVersion, {
     },
 })
 
-console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2")
 /**
  * Cached data source, will return initial stale values up to maxAge and refresh every refreshInterval.
  * @note Load function must return a IDB compatible object (i.e. no core objects, pass them through Serializer.objectify)

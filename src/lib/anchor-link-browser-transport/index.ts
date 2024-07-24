@@ -209,7 +209,6 @@ export default class BrowserTransport implements LinkTransport {
     }
 
     private hide() {
-        console.log("BrowserTransport###hide!!!")
         if (this.containerEl) {
             this.containerEl.classList.remove(`${this.classPrefix}-active`)
         }
@@ -217,7 +216,6 @@ export default class BrowserTransport implements LinkTransport {
     }
 
     private show() {
-        console.log("BrowserTransport###show!!!")
         if (this.containerEl) {
             this.containerEl.classList.add(`${this.classPrefix}-active`)
         }
@@ -267,17 +265,13 @@ export default class BrowserTransport implements LinkTransport {
         subtitle: string,
         showFooter = true
     ) {
-        console.log("BrowserTransport----------------displayRequest")
         const sameDeviceRequest = request.clone()
         const returnUrl = generateReturnUrl()
-        console.log("displayRequest, returnUrl: ", returnUrl)
         sameDeviceRequest.setInfoKey('same_device', true)
         sameDeviceRequest.setInfoKey('return_path', returnUrl)
 
         const sameDeviceUri = sameDeviceRequest.encode(true, false)
         const crossDeviceUri = request.encode(true, false)
-        console.log("displayRequest, sameDeviceUri: ", sameDeviceUri)
-        console.log("displayRequest, crossDeviceUri: ", crossDeviceUri)
 
         const qrEl = this.createEl({ class: 'qr' })
         try {
@@ -376,18 +370,13 @@ export default class BrowserTransport implements LinkTransport {
     }
 
     public onRequest(request: SigningRequest, cancel: (reason: string | Error) => void) {
-        console.log("sendRequest*******BrowserTransport#onRequest")
-        console.log("request, request: ", request)
         this.clearTimers()
         this.activeRequest = request
         this.activeCancel = cancel
         const title = request.isIdentity() ? 'Login' : 'Sign'
-        console.log("onRequest, title:", title)
         const subtitle =
             'Scan the QR-code with Anchor on another device or use the button to open it here.'
-        console.log("onRequest, subtitle:", subtitle)
         this.displayRequest(request, title, subtitle).catch(cancel)
-        console.log("sendRequest*******BrowserTransport#onRequest......finish")
     }
 
     public onSessionRequest(

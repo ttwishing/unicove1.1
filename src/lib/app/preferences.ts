@@ -10,9 +10,7 @@ export class Preferences {
 
 
     public async initStorage() {
-        console.log(`preferences.ts#initStorage---------->start`)
         const db = await dbPromise
-        console.log(`preferences.ts#initStorage---------->finish`)
     }
 
 }

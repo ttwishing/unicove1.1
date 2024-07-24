@@ -6,10 +6,8 @@ async function init() {
     try {
         await Promise.all([initAuth(), Preferences.shared.initStorage()])
     } catch (error) {
-        console.log("main.ts===error: ", error)
         console.warn('Error when initializing Anchor Link', error)
     } finally {
-        console.log("main.ts===finally")
     }
 }
 

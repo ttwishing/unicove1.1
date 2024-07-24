@@ -130,9 +130,7 @@ function waitForCallback(url: string, ctx: { cancel?: () => void }): Promise<Lin
                 }
             }
         }
-        console.log("waitForCallback......2")
         connect()
-        console.log("waitForCallback......finish")
     })
 }
 

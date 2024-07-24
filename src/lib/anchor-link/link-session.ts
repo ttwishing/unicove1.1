@@ -182,7 +182,6 @@ export class LinkChannelSession extends LinkSession implements LinkTransport {
     }
 
     onRequest(request: SigningRequest, cancel: (reason: string | Error) => void) {
-        console.log("onRequest~~~~~~~~~~~~~~~~~~~~~~~~~~~~~LinkInfo")
         const info = LinkInfo.from({
             expiration: new Date(Date.now() + this.timeout),
         })
@@ -236,7 +235,6 @@ export class LinkChannelSession extends LinkSession implements LinkTransport {
     }
 
     addLinkInfo(request: SigningRequest) {
-        console.log("~~~~~~~~~~~~~addLinkInfo~~~~~~~~~~~~~~~~LinkCreate")
         const createInfo = LinkCreate.from({
             session_name: this.identifier,
             request_key: this.metadata.request_key,

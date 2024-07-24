@@ -27,7 +27,6 @@ export function sealMessage(
     publicKey: PublicKey,
     nonce?: UInt64
 ): SealedMessage {
-    console.log("sealMessage~~~~~~~~~~~~~~~~~~~~~~~~~~~~~sealMessage")
     const secret = privateKey.sharedSecret(publicKey)
     if (!nonce) {
         nonce = UInt64.random()
