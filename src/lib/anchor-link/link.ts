@@ -620,7 +620,6 @@ export class Link {
                 metadata
             )
         }
-        console.log("login, session: ", session)
         await this.storeSession(session)
         return {
             ...res,

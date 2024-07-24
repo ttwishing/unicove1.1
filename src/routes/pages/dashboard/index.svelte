@@ -3,56 +3,23 @@
     import { derived } from "svelte/store";
     import { Asset } from "@wharfkit/antelope";
     import { Int128 } from "@wharfkit/antelope";
-    import { DelegatedBandwidth } from "$lib/app/abi-types";
-    import { getClient } from "$lib/app/api-client";
-    import { ChainFeatures } from "$lib/app/config";
-
     import Page from "./page.svelte";
     import SegmentGroup from "$lib/components/elements/segment/group.svelte";
     import Segment from "$lib/components/elements/segment.svelte";
 
-    import {
-        activeSession,
-        activeBlockchain,
-        currentAccount,
-        activePriceTicker,
-    } from "$lib/app/store";
+    import { activeBlockchain, currentAccount } from "$lib/app/store";
 
     import { systemToken, systemTokenKey } from "$lib/stores/tokens";
 
-    import { balances, fetchBalances } from "$lib/stores/balances";
+    import { balances } from "$lib/stores/balances";
     import { stateREX } from "../resources/resources";
+    import { delegations } from "../delegations/delegations";
 
-    interface Delegations {
-        rows: DelegatedBandwidth[];
-    }
-
-    const delegations: Readable<Delegations> = derived(
-        [activeBlockchain, currentAccount],
-        ([$activeBlockchain, $currentAccount], set) => {
-            if (
-                $activeBlockchain &&
-                $activeBlockchain.chainFeatures.has(ChainFeatures.Staking) &&
-                $currentAccount
-            ) {
-                getClient($activeBlockchain.chainId)
-                    .v1.chain.get_table_rows({
-                        code: "eosio",
-                        table: "delband",
-                        scope: $currentAccount.account_name,
-                        type: DelegatedBandwidth,
-                    })
-                    .then((result) => {
-                        set(result);
-                    })
-                    .catch((err) => {
-                        console.warn("Error retrieving delegations", err);
-                        set({ rows: [] });
-                    });
-            }
-        },
-    );
-
+    /**
+     * staked value
+     *
+     * cal by cpu_weight + net_weight
+     */
     const delegatedTokens = derived(
         [currentAccount, delegations],
         ([$currentAccount, $delegations]) => {
@@ -74,6 +41,15 @@
             return delegated;
         },
     );
+
+    /**
+     * rex value
+     * 
+     * currentAccount.rex_info.rex_balance.value * stateREX.value
+     
+     * stateREX: query api and interval queury
+     *
+     */
 
     const rexTokens: Readable<number> = derived(
         [currentAccount, stateREX, systemToken],
@@ -109,10 +85,14 @@
         },
     );
 
+    /**
+     * cal by balanceValue, rexValue, stakedValue
+     */
     const totalSystemTokens: Readable<Asset> = derived(
         [balances, currentAccount, delegatedTokens, rexTokens, systemTokenKey],
         ([$balances, $currentAccount, $delegated, $rex, $systemTokenKey]) => {
             let amount = 0;
+            //balance
             if ($currentAccount) {
                 $balances
                     .filter(
@@ -125,15 +105,21 @@
                         amount += record.quantity.value;
                     });
             }
+            // staked
             if ($delegated) {
                 amount += $delegated;
             }
+            //rex
             if ($rex) {
                 amount += $rex;
             }
             return Asset.from(amount, $activeBlockchain.coreTokenSymbol);
         },
     );
+
+    function sleep(delay: number) {
+        return new Promise((resolve) => setTimeout(resolve, delay));
+    }
 </script>
 
 <Page title="Account" subtitle="test">

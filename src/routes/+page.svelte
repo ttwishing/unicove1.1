@@ -6,10 +6,7 @@
 	import { activeSession, appReady } from "$lib/app/store";
 
 	$: needLogin = $activeSession === undefined;
-
-	import { onMount } from "svelte";
-
-	onMount(() => {});
+	import { redirect } from "@sveltejs/kit";
 </script>
 
 <svelte:head>

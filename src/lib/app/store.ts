@@ -31,11 +31,19 @@ export const activeBlockchain: Readable<ChainConfig> = derived(activeSession, (s
         return chains[0]
     }
 })
+// activeBlockchain.subscribe(value => {
+//     console.log("subscribe=========>activeBlockchain:", value)
+// })
 
 export const currentAccount = derived(
     accountProvider,
     ($accountProvider) => $accountProvider.account
 )
+
+// currentAccount.subscribe(value => {
+//     console.log("subscribe=========>currentAccount:", value)
+// })
+
 
 /** Active price ticker for the currently selected blockchain */
 export const activePriceTicker: Readable<number> = derived(

@@ -1,8 +1,8 @@
 <script lang="ts">
     import { activeSession } from "$lib/app/store";
-    import AccountSidebar from "./layout/sliderbar/index.svelte";
-    import NavigationBar from "./layout/navigation/index.svelte";
-    import Header from "./layout/header/index.svelte";
+    import AccountSidebar from "../../layout/sliderbar/index.svelte";
+    import NavigationBar from "../../layout/navigation/index.svelte";
+    import Header from "../../layout/header/index.svelte";
 
     /** Title of the page. */
     export let title: string = "";

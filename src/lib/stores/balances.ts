@@ -51,6 +51,10 @@ export const balances: Readable<Balance[]> = derived(
     initialBalances
 )
 
+// balances.subscribe(value => {
+//     console.log("subscribe=========>balances:", value)
+// })
+
 
 export function createBalanceFromCoreToken(session: LinkSession, balance: Asset): Balance {
     const token = createTokenFromChainId(session.chainId)
