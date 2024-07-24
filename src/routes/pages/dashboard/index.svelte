@@ -15,6 +15,7 @@
     import { stateREX } from "../resources/resources";
     import { delegations } from "../delegations/delegations";
 
+    export const handleNaviClick = null;
     /**
      * staked value
      *

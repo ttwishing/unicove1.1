@@ -1,0 +1,42 @@
+<script lang="ts">
+    import InputLabelled from "$lib/components/elements/input/labelled.svelte";
+
+    import { validatePresence } from "./validators/presence";
+    import { validatePublicKey } from "./validators/publicKey";
+
+    export let name: string = "";
+    export let value: string = "";
+    export let errorMessage: string | undefined = undefined;
+    export let valid: boolean = false;
+    export let focus: boolean = false;
+    export let fluid: boolean = false;
+    export let placeholder: string | undefined = undefined;
+
+    const validate = async (value: string) => {
+        try {
+            validatePresence(value);
+            validatePublicKey(value);
+        } catch (errorObject) {
+            errorMessage = errorObject.message;
+            valid = false;
+            return false;
+        }
+
+        errorMessage = undefined;
+        valid = true;
+        return true;
+    };
+</script>
+
+<InputLabelled
+    on:changed
+    {name}
+    {fluid}
+    {focus}
+    {placeholder}
+    bind:value
+    isValid={validate}
+/>
+
+<style type="scss">
+</style>

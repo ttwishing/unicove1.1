@@ -2,11 +2,11 @@
 	import Login from "./pages/login/login.svelte";
 	import Loading from "./pages/loading.svelte";
 	import Dashboard from "./pages/dashboard/index.svelte";
+	import Send from "./pages/send/index.svelte";
 
 	import { activeSession, appReady } from "$lib/app/store";
 
 	$: needLogin = $activeSession === undefined;
-	import { redirect } from "@sveltejs/kit";
 </script>
 
 <svelte:head>
@@ -20,7 +20,7 @@
 	{:else if needLogin}
 		<Login />
 	{:else}
-		<Dashboard />
+		<Send />
 	{/if}
 </main>
 

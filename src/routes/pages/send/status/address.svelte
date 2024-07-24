@@ -1,0 +1,33 @@
+<script lang="ts">
+    import type { PublicKey } from "@wharfkit/antelope";
+    import { activeBlockchain } from "$lib/app/store";
+    import Completed from "./template/completed.svelte";
+    import { Step, transferData } from "../transfer";
+
+    export let toAddress: PublicKey;
+    export let editable: boolean = false;
+
+    function changeRecipient() {
+        transferData.update((data) => ({
+            ...data,
+            step: Step.Recipient,
+            backStep: data.step,
+        }));
+    }
+
+    const changeStep = editable ? changeRecipient : undefined;
+</script>
+
+<Completed header="Receiving Address" {changeStep}>
+    <span
+        >{toAddress.toLegacyString(
+            $activeBlockchain?.coreTokenSymbol.name,
+        )}</span
+    >
+</Completed>
+
+<style type="scss">
+    span {
+        line-height: 32px;
+    }
+</style>

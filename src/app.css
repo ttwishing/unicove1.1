@@ -58,6 +58,12 @@
 	--main-black: #585d6e;
 }
 
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
+}
+
 body {
 	min-height: 100vh;
 	margin: 0;
@@ -112,11 +118,11 @@ pre {
 	margin: 0 auto;
 }
 
-input,
-button {
-	font-size: inherit;
-	font-family: inherit;
+input {
+	-webkit-appearance: none;
+	border-radius: 0;
 }
+
 
 button:focus:not(:focus-visible) {
 	outline: none;

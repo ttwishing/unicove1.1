@@ -8,6 +8,7 @@
     import NavigationContent from "./content.svelte";
 
     export let open = false;
+    export const handleNaviClick = null;
 
     $: primaryNavigation = [
         {

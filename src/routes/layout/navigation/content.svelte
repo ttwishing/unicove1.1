@@ -14,7 +14,10 @@
     }
 
     export let primaryNavigation: NavigationItem[] = [];
-    export let advancedNavigation: NavigationItem[] = [];
+
+    function handleNaviClick(item: NavigationItem) {
+        console.log(".......");
+    }
 </script>
 
 <nav class:floating>
@@ -24,7 +27,7 @@
     <ul>
         {#each primaryNavigation as item}
             <li>
-                <a href={item.path}>
+                <a href="" on:click={handleNaviClick(item)}>
                     <span class="name">{item.name}</span>
                 </a>
             </li>
