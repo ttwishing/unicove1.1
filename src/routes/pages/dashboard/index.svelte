@@ -137,7 +137,6 @@
 </script>
 
 <Page title="Account" subtitle="test">
-    <div>index</div>
     {#if $balances}
         <div class="container">
             <div class="balances">

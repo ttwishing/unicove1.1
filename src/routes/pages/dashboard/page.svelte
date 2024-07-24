@@ -88,12 +88,10 @@
         min-height: 100vh;
         grid-area: rightbar;
         position: fixed;
-        background-color: green;
         right: 0;
     }
 
     .page-main {
-        background-color: aqua;
         min-height: calc(100vh - #{$menubar_height} - #{$bottom_padding});
         padding-bottom: $bottom_padding;
         grid-area: main;
