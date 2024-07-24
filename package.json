@@ -27,6 +27,7 @@
 		"@greymass/miniaes": "^1.0.0",
 		"@wharfkit/antelope": "^1.0.8",
 		"@wharfkit/signing-request": "^3.2.0",
+		"@wharfkit/resources": "^1.2.3",
 		"fetch-ponyfill": "^7.1.0",
 		"isomorphic-ws": "^4.0.1",
 		"pako": "^2.0.3",
