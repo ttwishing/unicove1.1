@@ -348,9 +348,12 @@ export class Link {
         transport?: LinkTransport,
         broadcast = false
     ) {
+        console.log("sendRequest=========================")
         const t = transport || this.transport
+        console.log("transport = ", transport)
         try {
             const linkUrl = request.data.callback
+            console.log("linkUrl = ", linkUrl)
             if (linkUrl !== callback.url) {
                 throw new Error('Invalid request callback')
             }
@@ -362,6 +365,7 @@ export class Link {
             let done = false
             const cancel = new Promise<never>((resolve, reject) => {
                 t.onRequest(request, (reason) => {
+                    console.log("onRequest cancel")
                     if (done) {
                         // ignore any cancel calls once callbackResponse below has resolved
                         return
@@ -376,6 +380,7 @@ export class Link {
                 })
             })
             const callbackResponse = await Promise.race([callback.wait(), cancel])
+            console.log("callbackResponse = ", callbackResponse)
             done = true
             if (typeof callbackResponse.rejected === 'string') {
                 throw new CancelError(callbackResponse.rejected)
@@ -463,6 +468,11 @@ export class Link {
         options?: TransactOptions,
         transport?: LinkTransport
     ): Promise<TransactResult> {
+        console.log("link=============================transact")
+        console.log("args = ", args)
+        console.log("options = ", options)
+        console.log("transport = ", transport)
+
         const o = options || {}
         const t = transport || this.transport
         const c = o.chain !== undefined ? this.getChain(o.chain) : undefined
@@ -470,6 +480,7 @@ export class Link {
         const noModify = o.noModify !== undefined ? o.noModify : !broadcast
         // Initialize the loading state of the transport
         if (t && t.showLoading) {
+            console.log("showLoading")
             t.showLoading()
         }
         // eosjs transact compat: upgrade to transaction if args have any header fields
@@ -495,7 +506,14 @@ export class Link {
                 },
             }
         }
+        console.log("args = ", args)
+        console.log("c = ", c)
+        console.log("t = ", t)
+        console.log("broadcast = ", broadcast)
+        console.log("noModify = ", noModify)
         const { request, callback } = await this.createRequest(args, c, t)
+        console.log("request = ", request)
+        console.log("callback = ", callback)
         if (noModify) {
             request.setInfoKey('no_modify', true, 'bool')
         }

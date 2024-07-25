@@ -13,7 +13,6 @@
     export let placeholder: string | undefined = undefined;
 
     const isValid = async (value: string): Promise<boolean> => {
-        console.log(".......", value);
         try {
             if (value) {
                 loading = true;

@@ -16,10 +16,6 @@ let lastResult: any = null
 export const delegations: Readable<Delegations> = derived(
     [activeBlockchain, currentAccount],
     ([$activeBlockchain, $currentAccount], set) => {
-        console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>delegations")
-        console.log("activeBlockchain: ", activeBlockchain)
-        console.log("chainFeatures: ", $activeBlockchain.chainFeatures.has(ChainFeatures.Staking))
-        console.log("currentAccount: ", $currentAccount)
         if (
             $activeBlockchain &&
             $activeBlockchain.chainFeatures.has(ChainFeatures.Staking) &&
@@ -33,8 +29,6 @@ export const delegations: Readable<Delegations> = derived(
                     type: DelegatedBandwidth,
                 })
                 .then((result) => {
-                    console.log("result:", result)
-                    console.log("isSame:", lastResult == result, lastResult === result)
                     lastResult = result
                     set(result);
                 })

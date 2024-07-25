@@ -15,9 +15,7 @@
 
     export let primaryNavigation: NavigationItem[] = [];
 
-    function handleNaviClick(item: NavigationItem) {
-        console.log(".......");
-    }
+    function handleNaviClick(item: NavigationItem) {}
 </script>
 
 <nav class:floating>

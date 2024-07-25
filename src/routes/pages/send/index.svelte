@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Readable } from "svelte/motion";
-    import { derived } from "svelte/store";
+    import { derived, get, writable } from "svelte/store";
     import { activeSession } from "$lib/app/store";
     import { balances } from "$lib/stores/balances";
     import type { Balance } from "$lib/stores/balances";
@@ -14,6 +14,7 @@
     import { transferData } from "./transfer";
     import { tokens } from "$lib/stores/tokens";
     import { tokenFromBalance } from "$lib/stores/tokens";
+    import Main from "./main.svelte";
 
     function retryCallback() {}
 
@@ -90,6 +91,11 @@
 </Page>
 
 <style lang="scss">
+    .test {
+        width: 100px;
+        height: 100px;
+        background-color: red;
+    }
     .container {
         border: 1px solid var(--divider-grey);
         border-radius: 20px;

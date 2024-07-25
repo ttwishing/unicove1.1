@@ -20,7 +20,7 @@
 	{:else if needLogin}
 		<Login />
 	{:else}
-		<Send />
+		<Dashboard />
 	{/if}
 </main>
 

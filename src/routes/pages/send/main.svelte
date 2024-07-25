@@ -7,6 +7,7 @@
     import TransferRecipient from "./step/recipient.svelte";
     import TransferAmount from "./step/amount.svelte";
     import TransferConfirm from "./step/confirm.svelte";
+    import TransferSending from "./step/sending.svelte";
 
     import { activeBlockchain, activeSession } from "$lib/app/store";
     import type { Balance } from "$lib/stores/balances";
@@ -16,15 +17,95 @@
     import Icon from "$lib/components/elements/icon.svelte";
 
     import type { FormTransaction } from "$lib/app/ui-types";
+    import { FIOTransfer, Transfer } from "$lib/app/abi-types";
     import { Step } from "./transfer";
     import { transferData } from "./transfer";
+    import { txFee } from "./fio";
 
     export let balance: Readable<Balance | undefined>;
     export let token: Readable<Token | undefined>;
     export let resetData: () => void;
 
+    const context: FormTransaction = getContext("transaction");
+
+    const tokenContract: Readable<Name> = derived([token], ([$token]) => {
+        if ($token) {
+            return Name.from($token.contract);
+        }
+        return Name.from($activeBlockchain!.coreTokenContract);
+    });
+
+    export const field = derived([balance], ([$balance]) => {
+        if ($balance) {
+            return $balance.quantity;
+        }
+        return undefined;
+    });
+
+    function getActionData() {
+        switch (String($tokenContract)) {
+            case "fio.token": {
+                return FIOTransfer.from({
+                    payee_public_key: $transferData.toAddress!.toLegacyString(
+                        $activeBlockchain!.coreTokenSymbol.name,
+                    ),
+                    amount:
+                        $transferData.quantity && $transferData.quantity!.units,
+                    max_fee: $txFee!.units,
+                    actor: $activeSession!.auth.actor,
+                    tpid: "tpid@greymass",
+                });
+            }
+            default: {
+                return Transfer.from({
+                    from: $activeSession!.auth.actor,
+                    to: $transferData.toAccount,
+                    quantity: $transferData.quantity,
+                    memo: $transferData.memo || "",
+                });
+            }
+        }
+    }
+
     async function handleTransfer() {
-        console.log("handleTransfer");
+        console.log("handleTransfer.......");
+        transferData.update((data) => ({
+            ...data,
+            step: Step.Sending,
+            backStep: undefined,
+        }));
+
+        try {
+            const authorization = [$activeSession!.auth];
+            const account = get(tokenContract);
+            const name = $activeBlockchain!.coreTokenTransfer;
+            const data = getActionData();
+            // Perform the transfer
+            const result = await $activeSession!.transact({
+                action: {
+                    authorization: authorization,
+                    account: account,
+                    name: name,
+                    data: data,
+                },
+            });
+            // Reset the form data
+            resetData();
+            // If the context exists and this is part of a FormTransaction
+            if (context) {
+                // Pass the transaction ID to the parent
+                const txid = String(result.transaction.id);
+                context.setTransaction(txid);
+                // Await an update on the field expected for this transaction
+                context.awaitAccountUpdate(field);
+            }
+        } catch (error) {
+            console.warn("Error during transact", error);
+
+            if (context) {
+                context.setTransactionError(error);
+            }
+        }
     }
 
     function handleBack() {}
@@ -81,9 +162,10 @@
         <!-- {#if $transferData.step === Step.Receive}
             <TransferReceive />
         {/if}
+         -->
         {#if $transferData.step === Step.Sending}
             <TransferSending token={$token} />
-        {/if}  -->
+        {/if}
     {:else}
         No balance of this token to transfer!
     {/if}
