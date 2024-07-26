@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Name } from "@wharfkit/antelope";
+    import { Name, type PermissionLevelType } from "@wharfkit/antelope";
     import { getContext } from "svelte";
     import type { Readable } from "svelte/store";
     import { derived, get } from "svelte/store";
@@ -57,6 +57,25 @@
                 });
             }
             default: {
+                console.log("---getActionData---");
+                console.log(
+                    "from",
+                    $activeSession!.auth.actor,
+                    String($activeSession!.auth.actor),
+                );
+                console.log(
+                    "to",
+                    $transferData.toAccount,
+                    String($transferData.toAccount),
+                );
+                console.log(
+                    "quantity",
+                    $transferData.quantity,
+                    String($transferData.quantity),
+                    $transferData.quantity?.value,
+                );
+                console.log("memo = ", $transferData.memo);
+                console.log("---getActionData---");
                 return Transfer.from({
                     from: $activeSession!.auth.actor,
                     to: $transferData.toAccount,
@@ -76,9 +95,16 @@
         }));
 
         try {
-            const authorization = [$activeSession!.auth];
+            console.log("auth", String($activeSession!.auth));
+            const authorization: PermissionLevelType[] = [$activeSession!.auth];
             const account = get(tokenContract);
             const name = $activeBlockchain!.coreTokenTransfer;
+            const authorizationValue = authorization.map((value) =>
+                String(value),
+            );
+            console.log("authorizationValue", authorizationValue);
+            console.log("account", String(account));
+            console.log("name", String(name));
             const data = getActionData();
             // Perform the transfer
             const result = await $activeSession!.transact({

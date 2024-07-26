@@ -318,6 +318,9 @@ export class Link {
         transport?: LinkTransport
     ) {
         console.log("link.ts===================createRequest")
+        console.log("args = ", args)
+        console.log("chain = ", chain)
+        console.log("transport = ", transport)
         //登录场景：chain, transport参数都为空. this.transport：BrowserTransport
         const t = transport || this.transport
         let request: SigningRequest
@@ -497,7 +500,7 @@ export class Link {
         options?: TransactOptions,
         transport?: LinkTransport
     ): Promise<TransactResult> {
-        console.log("link=============================transact")
+        console.log("link.ts=============================transact")
         console.log("args = ", args)
         console.log("options = ", options)
         console.log("transport = ", transport)
@@ -523,6 +526,7 @@ export class Link {
                 anyArgs.max_cpu_usage_ms ||
                 anyArgs.delay_sec)
         ) {
+            console.log("reset args!!!")
             args = {
                 transaction: {
                     expiration: '1970-01-01T00:00:00',
@@ -646,7 +650,9 @@ export class Link {
         })
         console.log("identify_result = ", res)
         const metadata = sessionMetadata(res.payload, res.resolved.request)
+        console.log("metadata = ", metadata)
         const signerKey = res.proof.recover()
+        console.log("signerKey = ", signerKey)
         let session: LinkSession
         if (res.payload.link_ch && res.payload.link_key && res.payload.link_name) {
             session = new LinkChannelSession(

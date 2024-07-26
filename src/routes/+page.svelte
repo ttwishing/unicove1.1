@@ -4,7 +4,10 @@
 	import Dashboard from "./pages/dashboard/index.svelte";
 	import Send from "./pages/send/index.svelte";
 
-	import { activeSession, appReady } from "$lib/app/store";
+	import { activeSession, appReady, dashboardPage } from "$lib/app/store";
+	$: {
+		console.log("dashboardPage = ", $dashboardPage);
+	}
 
 	$: needLogin = $activeSession === undefined;
 </script>
@@ -19,8 +22,10 @@
 		<Loading />
 	{:else if needLogin}
 		<Login />
-	{:else}
+	{:else if "/" === $dashboardPage}
 		<Dashboard />
+	{:else}
+		<Send />
 	{/if}
 </main>
 

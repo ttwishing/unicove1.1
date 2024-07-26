@@ -15,6 +15,8 @@ export const preferences = Preferences.shared
 
 export const appReady = writable<boolean>(false)
 
+export const dashboardPage = writable<string>("/")
+
 export const activeSession = writable<LinkSession | undefined>(undefined)
 export const availableSessions = writable<SessionLike[]>([])
 
@@ -74,4 +76,6 @@ export const waitForStoreValue = <StoreType>(
         })
     })
 }
+
+
 

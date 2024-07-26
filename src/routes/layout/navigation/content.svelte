@@ -2,6 +2,7 @@
     import { createEventDispatcher } from "svelte";
 
     import { preferences } from "$lib/app/store";
+    import { dashboardPage } from "$lib/app/store";
 
     export let expand = true;
     export let floating = false;
@@ -15,7 +16,9 @@
 
     export let primaryNavigation: NavigationItem[] = [];
 
-    function handleNaviClick(item: NavigationItem) {}
+    function handleNaviClick(item: NavigationItem) {
+        dashboardPage.set(item.path);
+    }
 </script>
 
 <nav class:floating>

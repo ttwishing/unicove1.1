@@ -48,7 +48,7 @@ export function sealMessage(
  * Extract session metadata from a callback payload and request.
  * @internal
  */
-export function sessionMetadata(payload: CallbackPayload, request: SigningRequest) {
+export function sessionMetadata(payload: CallbackPayload, request: SigningRequest): Record<string, any> {
     const metadata: Record<string, any> = {
         // backwards compat, can be removed next major release
         sameDevice: request.getRawInfo()['return_path'] !== undefined,

@@ -7,6 +7,7 @@ import {
 } from '@wharfkit/antelope'
 
 import type {
+    Bytes,
     NameType,
     PermissionLevelType,
     PrivateKeyType,
@@ -136,16 +137,26 @@ export class LinkChannelSession extends LinkSession implements LinkTransport {
     private channelName: string
 
     constructor(link: Link, data: LinkChannelSessionData, metadata: any) {
+        console.log("LinkChannelSession========================constructor")
         super()
         this.link = link
+        console.log("this.link = ", this.link)
         this.chainId = ChainId.from(data.chainId)
+        console.log("this.chainId = ", this.chainId, String(data.chainId))
         this.auth = PermissionLevel.from(data.auth)
+        console.log("this.auth = ", this.auth)
         this.publicKey = PublicKey.from(data.publicKey)
+        console.log("this.publicKey = ", this.publicKey)
         this.identifier = Name.from(data.identifier)
+        console.log("this.identifier = ", this.identifier)
         const privateKey = PrivateKey.from(data.requestKey)
+        console.log("privateKey = ", privateKey)
         this.channelKey = PublicKey.from(data.channel.key)
+        console.log("this.channelKey = ", this.channelKey)
         this.channelUrl = data.channel.url
+        console.log("this.channelUrl = ", this.channelUrl)
         this.channelName = data.channel.name
+        console.log("this.channelName = ", this.channelName)
         this.encrypt = (request) => {
             return sealMessage(request.encode(true, false), privateKey, this.channelKey)
         }
@@ -167,6 +178,7 @@ export class LinkChannelSession extends LinkSession implements LinkTransport {
             },
             metadata: this.metadata,
         })
+        console.log("LinkChannelSession========================constructor#finish")
     }
 
     onSuccess(request: SigningRequest, result: TransactResult) {
@@ -182,9 +194,12 @@ export class LinkChannelSession extends LinkSession implements LinkTransport {
     }
 
     onRequest(request: SigningRequest, cancel: (reason: string | Error) => void) {
+        console.log("LinkChannelSession==========================onRequest")
         const info = LinkInfo.from({
             expiration: new Date(Date.now() + this.timeout),
         })
+        console.log("info = ", info)
+        console.log("this.link.transport = ", this.link.transport)
         if (this.link.transport.onSessionRequest) {
             this.link.transport.onSessionRequest(this, request, cancel)
         }
@@ -193,7 +208,7 @@ export class LinkChannelSession extends LinkSession implements LinkTransport {
         }, this.timeout)
         request.setInfoKey('link', info)
         let payloadSent = false
-        const payload = Serializer.encode({ object: this.encrypt(request) })
+        const payload: Bytes = Serializer.encode({ object: this.encrypt(request) })
         if (this.link.transport.sendSessionPayload) {
             try {
                 payloadSent = this.link.transport.sendSessionPayload(payload, this)
@@ -201,9 +216,11 @@ export class LinkChannelSession extends LinkSession implements LinkTransport {
                 logWarn('Unexpected error when transport tried to send session payload', error)
             }
         }
+        console.log("payloadSent = ", payloadSent)
         if (payloadSent) {
             return
         }
+        console.log("this.channelUrl = ", this.channelUrl)
         fetch(this.channelUrl, {
             method: 'POST',
             headers: {
@@ -212,6 +229,7 @@ export class LinkChannelSession extends LinkSession implements LinkTransport {
             body: payload.array,
         })
             .then((response) => {
+                console.log("response.status = ", response.status)
                 if (Math.floor(response.status / 100) !== 2) {
                     clearTimeout(timer)
                     if (response.status === 202) {
@@ -268,11 +286,17 @@ export class LinkChannelSession extends LinkSession implements LinkTransport {
     }
 
     async transact(args: TransactArgs, options?: TransactOptions) {
+        console.log("LinkChannelSession==========================transact")
+        console.log("args = ", args)
+        console.log("options = ", options)
+        console.log("this.chainId = ", String(this.chainId))
+        console.log()
         const res: TransactResult = await this.link.transact(
             args,
             { ...options, chain: this.chainId },
             this
         )
+        console.log("traction_result = ", res)
         // update session if callback payload contains new channel info
         if (res.payload.link_ch && res.payload.link_key && res.payload.link_name) {
             try {
