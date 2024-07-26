@@ -1,6 +1,6 @@
 import { PermissionLevel } from '@wharfkit/antelope';
 import { ChainId, SigningRequest } from '@wharfkit/signing-request'
-
+import { get } from 'svelte/store'
 
 import { Link } from "$lib/anchor-link/link"
 import Transport from '$lib/anchor-link-browser-transport'
@@ -17,6 +17,11 @@ export interface SessionLike {
 
 function sleep(delay: number) {
     return new Promise((resolve) => setTimeout(resolve, delay))
+}
+
+/** Compare two session-ish objects. */
+export function sessionEquals(a: SessionLike, b: SessionLike) {
+    return a.auth.equals(b.auth) && a.chainId.equals(b.chainId)
 }
 
 const transport = new Transport({
@@ -39,6 +44,8 @@ export async function init() {
 }
 
 export async function login() {
+    console.log("auth.ts======================login")
+    console.log("appId ", appId)
     const result = await link.login(appId)
     if (result.account) {
         // populate account cache with the account returned by login so we don't need to re-fetch it
@@ -49,12 +56,33 @@ export async function login() {
     activeSession.set(result.session)
 }
 
+
+/** Remove existing session. */
+export async function logout(id: SessionLike) {
+    console.log("logout>>>>>>>>>>>>>>>>>>>>>>.")
+    const session = await link.restoreSession(appId, id.auth, id.chainId)
+    if (session) {
+        await session.remove()
+        const list = await link.listSessions(appId)
+        let active = get(activeSession)
+        if (active && sessionEquals(active, session)) {
+            // update active session if we logged out from it
+            if (list.length > 0) {
+                activate(list[0])
+            } else {
+                activeSession.set(undefined)
+            }
+        }
+        availableSessions.set(list)
+    }
+}
+
 export async function activate(id: SessionLike) {
-    // const session = await link.restoreSession(appId, id.auth, id.chainId)
-    // if (!session) {
-    //     throw new Error('No such session')
-    // }
-    // activeSession.set(session)
+    const session = await link.restoreSession(appId, id.auth, id.chainId)
+    if (!session) {
+        throw new Error('No such session')
+    }
+    activeSession.set(session)
 
     // if (get(activeEvmSession)) {
     //     activeEvmSession.set(undefined)

@@ -265,10 +265,6 @@ export default class BrowserTransport implements LinkTransport {
         subtitle: string,
         showFooter = true
     ) {
-        console.log("displayRequest======================")
-        console.log("title = ", title)
-        console.log("subtitle = ", subtitle)
-        console.log("showFooter = ", showFooter)
         const sameDeviceRequest = request.clone()
         const returnUrl = generateReturnUrl()
         sameDeviceRequest.setInfoKey('same_device', true)

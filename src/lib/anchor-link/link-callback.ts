@@ -46,6 +46,7 @@ class BuoyCallback implements LinkCallback {
     constructor(readonly url: string) { }
     private ctx: { cancel?: () => void } = {}
     wait() {
+        console.log("sendRequest-second: ", this)
         if (this.url.includes('hyperbuoy')) {
             return pollForCallback(this.url, this.ctx)
         } else {
@@ -64,9 +65,8 @@ class BuoyCallback implements LinkCallback {
  * @internal
  */
 function waitForCallback(url: string, ctx: { cancel?: () => void }): Promise<LinkCallbackResponse> {
-    console.log("sendRequest*******waitForCallback")
     return new Promise<LinkCallbackResponse>((resolve, reject) => {
-        console.log("sendRequest*******waitForCallback_running")
+        console.log("sendRequest-second: start...")
         let active = true
         let retries = 0
         const socketUrl = url.replace(/^http/, 'ws')
@@ -79,9 +79,8 @@ function waitForCallback(url: string, ctx: { cancel?: () => void }): Promise<Lin
                 reject(error)
             }
         }
-        console.log("waitForCallback......1")
+
         const connect = () => {
-            console.log("connect...connect")
             const socket = new WebSocket(socketUrl)
             ctx.cancel = () => {
                 console.log("connect#cancel")
@@ -130,6 +129,7 @@ function waitForCallback(url: string, ctx: { cancel?: () => void }): Promise<Lin
                 }
             }
         }
+        console.log("connect start...")
         connect()
     })
 }

@@ -4,7 +4,7 @@
     import MediaQuery from "$lib/components/utils/media-query.svelte";
     import Button from "$lib/components/elements/button.svelte";
     import Text from "$lib/components/elements/text.svelte";
-    import Loginbutton from "./loginbutton.svelte";
+    import Loginbutton from "$lib/components/elements/button/login.svelte";
 
     let creatingAccount = false;
 

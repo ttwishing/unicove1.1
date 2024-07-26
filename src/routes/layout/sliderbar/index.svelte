@@ -1,10 +1,18 @@
-<script>
+<script lang="ts">
     export let open = false;
+    import type { SessionLike } from "$lib/app/auth";
+    import List from "./list.svelte";
+    import { activate } from "$lib/app/auth";
+
+    function onSelect(session: SessionLike) {
+        activate(session);
+        open = false;
+    }
 </script>
 
 <slider class:open>
     <div class="header">Accounts</div>
-    <!-- <List {onSelect} /> -->
+    <List {onSelect} />
 </slider>
 
 <style lang="scss">
@@ -23,6 +31,7 @@
         border-color: var(--main-grey);
         border-right-width: 2px;
         z-index: 1001;
+        box-sizing: border-box;
     }
     .header {
         border-bottom: 1px solid var(--divider-grey);

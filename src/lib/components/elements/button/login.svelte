@@ -1,6 +1,7 @@
 <script lang="ts">
     import { login } from "$lib/app/auth";
     import Button from "$lib/components/elements/button.svelte";
+    import Icon from "$lib/components/elements/icon.svelte";
     import Text from "$lib/components/elements/text.svelte";
     import { addToast } from "$lib/stores/toast";
 
@@ -15,22 +16,26 @@
         | "effect" = "secondary";
 
     function loginHandler() {
+        console.log("login.svelte======================loginHander");
         disabled = true;
         login()
             .catch((err) => {
+                console.log("loginHander, cache");
                 addToast({ title: "Unable to login", message: err.message });
             })
             .finally(() => {
+                console.log("loginHander, finnal");
                 disabled = false;
             });
     }
 </script>
 
 {#if asLink}
-    <a href={undefined} on:click={loginHandler}><slot /></a>
+    <a href={undefined} on:click={loginHandler} alt="login link"><slot /></a>
 {:else}
     <div class="login">
         <Button {disabled} size="regular" {style} on:action={loginHandler}>
+            <Icon name="log-in" />
             <Text><slot /></Text>
         </Button>
     </div>

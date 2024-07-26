@@ -212,6 +212,7 @@ export class Link {
 
     /** Create a new link instance. */
     constructor(options: LinkOptions) {
+        console.log("link.ts========================constructor")
         if (typeof options !== 'object') {
             throw new TypeError('Missing options object')
         }
@@ -219,6 +220,7 @@ export class Link {
             throw new TypeError('options.transport is required')
         }
         let chains = options.chains || []
+        console.log("chains = ", chains)
         if (options.chainId && options.client) {
             if (options.chains.length > 0) {
                 throw new TypeError(
@@ -242,6 +244,9 @@ export class Link {
             }
             return new LinkChain(chain.chainId, chain.nodeUrl)
         })
+        console.log("this.chains = ", this.chains)
+
+        console.log("service = ", options.service)
         if (options.service === undefined || typeof options.service === 'string') {
             this.callbackService = new BuoyCallbackService(
                 options.service || LinkOptions.defaults.service
@@ -249,18 +254,26 @@ export class Link {
         } else {
             this.callbackService = options.service
         }
+        console.log("this.callbackService = ", this.callbackService)
         this.transport = options.transport
+        console.log("this.transport = ", this.transport)
+        console.log("storage = ", options.storage)
+        console.log("this.transport.storage = ", this.transport.storage)
         if (options.storage !== null) {
             this.storage = options.storage || this.transport.storage
         }
+        console.log("this.storage = ", this.storage)
         this.verifyProofs =
             options.verifyProofs !== undefined
                 ? options.verifyProofs
                 : LinkOptions.defaults.verifyProofs
+        console.log("this.verifyProofs = ", this.verifyProofs)
         this.encodeChainIds =
             options.encodeChainIds !== undefined
                 ? options.encodeChainIds
                 : LinkOptions.defaults.encodeChainIds
+        console.log("this.encodeChainIds = ", this.encodeChainIds)
+        console.log("link.ts========================constructor#finish")
     }
 
     /**
@@ -304,9 +317,12 @@ export class Link {
         chain?: LinkChain,
         transport?: LinkTransport
     ) {
+        console.log("link.ts===================createRequest")
+        //登录场景：chain, transport参数都为空. this.transport：BrowserTransport
         const t = transport || this.transport
         let request: SigningRequest
         if (chain || this.chains.length === 1) {
+            console.log("sinlge-chain")
             const c = chain || this.chains[0]
             request = await SigningRequest.create(
                 {
@@ -317,17 +333,19 @@ export class Link {
                 { abiProvider: c, zlib }
             )
         } else {
+            console.log("multi-chain")
             // multi-chain request
-            request = await SigningRequest.create(
-                {
-                    ...args,
-                    chainId: null,
-                    chainIds: this.encodeChainIds ? this.chains.map((c) => c.chainId) : undefined,
-                    broadcast: false,
-                },
-                // abi's will be pulled from the first chain and assumed to be identical on all chains
-                { abiProvider: this.chains[0], zlib }
-            )
+            const requestArgs = {
+                ...args,
+                chainId: null,
+                chainIds: this.encodeChainIds ? this.chains.map((c) => c.chainId) : undefined,
+                broadcast: false,
+            }
+            // abi's will be pulled from the first chain and assumed to be identical on all chains
+            const requestOptions = { abiProvider: this.chains[0], zlib }
+            console.log("requestArgs", requestArgs)
+            console.log("requestOptions", requestOptions)
+            request = await SigningRequest.create(requestArgs, requestOptions)
         }
         if (t.prepare) {
             request = await t.prepare(request)
@@ -348,9 +366,9 @@ export class Link {
         transport?: LinkTransport,
         broadcast = false
     ) {
-        console.log("sendRequest=========================")
+        console.log("link.ts===================sendRequest")
+        //登录场景:chain, transport, broadcast空
         const t = transport || this.transport
-        console.log("transport = ", transport)
         try {
             const linkUrl = request.data.callback
             console.log("linkUrl = ", linkUrl)
@@ -363,9 +381,11 @@ export class Link {
 
             // wait for callback or user cancel
             let done = false
+            console.log("sendRequest-first: ", t)
             const cancel = new Promise<never>((resolve, reject) => {
+                console.log("sendRequest-first: start...")
                 t.onRequest(request, (reason) => {
-                    console.log("onRequest cancel")
+                    console.log("sendRequest-first cancelled")
                     if (done) {
                         // ignore any cancel calls once callbackResponse below has resolved
                         return
@@ -379,6 +399,8 @@ export class Link {
                     reject(error)
                 })
             })
+            // 发送请求，待app端签名；callback建立websocket, 待app端返回信息, 通信完成后关闭socket
+            // trace: callback.wait任务返回app回应；cancel任务无响应，除非取消，取消执行reject后，进入异常处理
             const callbackResponse = await Promise.race([callback.wait(), cancel])
             console.log("callbackResponse = ", callbackResponse)
             done = true
@@ -387,12 +409,14 @@ export class Link {
             }
             const payload = callbackResponse as CallbackPayload
             const signer = PermissionLevel.from({
-                actor: payload.sa,
-                permission: payload.sp,
+                actor: payload.sa, //账号
+                permission: payload.sp, //权限
             })
+            console.log("signer = ", signer)
             const signatures: Signature[] = Object.keys(payload)
                 .filter((key) => key.startsWith('sig') && key !== 'sig0')
                 .map((key) => Signature.from(payload[key]!))
+            console.log("signatures = ", signatures)
             let c: LinkChain
             if (!chain && this.chains.length > 1) {
                 if (!payload.cid) {
@@ -400,27 +424,31 @@ export class Link {
                         'Multi chain response payload must specify resolved chain id (cid)'
                     )
                 }
-                c = this.getChain(payload.cid)
+                c = this.getChain(payload.cid) //链路id, 比如我是用jungle4登录的
+                console.log("chain_0 = ", c)
             } else {
                 c = chain || this.getChain(0)
                 if (payload.cid && !c.chainId.equals(payload.cid)) {
                     throw new Error('Got response for wrong chain id')
                 }
+                console.log("chain_1 = ", c)
             }
             // recreate transaction from request response
             const resolved = await ResolvedSigningRequest.fromPayload(payload, {
                 zlib,
                 abiProvider: c,
             })
+            console.log("resolved = ", resolved)
             // prepend cosigner signature if present
             const cosignerSig = resolved.request.getInfoKey('cosig', {
                 type: Signature,
                 array: true,
             }) as Signature[] | undefined
-
+            console.log("cosignerSig = ", cosignerSig)
             if (cosignerSig) {
                 signatures.unshift(...cosignerSig)
             }
+            console.log("signatures = ", signatures)
             const result: TransactResult = {
                 resolved,
                 chain: c,
@@ -443,6 +471,7 @@ export class Link {
             }
             return result
         } catch (error) {
+            console.log("error = ", error)
             if (t.onFailure) {
                 t.onFailure(request, error)
             }
@@ -537,13 +566,18 @@ export class Link {
             identity: { permission: args.requestPermission, scope: args.scope },
             info: args.info,
         })
+        console.log("request = ", request)
+        console.log("callback = ", callback)
         const res = await this.sendRequest(request, callback)
+        console.log("sendRequest_result = ", res)
         if (!res.resolved.request.isIdentity()) {
             throw new IdentityError('Unexpected response')
         }
 
         let account: API.v1.AccountObject | undefined
         const proof = res.resolved.getIdentityProof(res.signatures[0])
+        console.log("proof = ", proof)
+        console.log("this.verifyProofs = ", this.verifyProofs)
         if (this.verifyProofs) {
             account = await res.chain.client.v1.chain.get_account(res.signer.actor)
             if (!account) {
@@ -565,7 +599,8 @@ export class Link {
                 throw new IdentityError(`Invalid identify proof for: ${proof.signer}`)
             }
         }
-
+        console.log("account = ", account)
+        console.log("args.requestPermission = ", args.requestPermission)
         if (args.requestPermission) {
             const perm = PermissionLevel.from(args.requestPermission)
             if (
@@ -578,6 +613,7 @@ export class Link {
                 )
             }
         }
+
         return {
             ...res,
             account,
@@ -591,6 +627,7 @@ export class Link {
      *                   Should be set to the contract account if applicable.
      */
     public async login(identifier: NameType): Promise<LoginResult> {
+        console.log("link.ts======================login")
         const privateKey = PrivateKey.generate('K1')
         const requestKey = privateKey.toPublic()
         const createInfo = LinkCreate.from({
@@ -598,6 +635,7 @@ export class Link {
             request_key: requestKey,
             user_agent: this.getUserAgent(),
         })
+        console.log("createInfo = ", createInfo)
 
         const res = await this.identify({
             scope: identifier,
@@ -606,6 +644,7 @@ export class Link {
                 scope: identifier,
             },
         })
+        console.log("identify_result = ", res)
         const metadata = sessionMetadata(res.payload, res.resolved.request)
         const signerKey = res.proof.recover()
         let session: LinkSession
@@ -626,6 +665,7 @@ export class Link {
                 },
                 metadata
             )
+            console.log("session_0 = ", session)
         } else {
             session = new LinkFallbackSession(
                 this,
@@ -637,6 +677,7 @@ export class Link {
                 },
                 metadata
             )
+            console.log("session_1 = ", session)
         }
         await this.storeSession(session)
         return {
@@ -711,6 +752,7 @@ export class Link {
      * @throws If no [[LinkStorage]] adapter is configured or there was an error retrieving the session list.
      **/
     public async listSessions(identifier: NameType) {
+        console.log("listSessions=========================")
         if (!this.storage) {
             throw new Error('Unable to list sessions: No storage adapter configured')
         }
@@ -800,18 +842,24 @@ export class Link {
         chainId: ChainId,
         remove = false
     ) {
+        console.log("link.ts======================touchSession")
         const list = await this.listSessions(identifier)
         const existing = list.findIndex(
             (item) => item.auth.equals(auth) && item.chainId.equals(chainId)
         )
+        console.log("existing = ", existing)
         if (existing >= 0) {
             list.splice(existing, 1)
         }
+        console.log("remove = ", remove)
         if (remove === false) {
             list.unshift({ auth, chainId })
         }
         const key = this.sessionKey(identifier, 'list')
-        await this.storage!.write(key, JSON.stringify(list))
+        console.log("key = ", key)
+        const data = JSON.stringify(list)
+        console.log("data = ", data)
+        await this.storage!.write(key, data)
     }
 
     /**
@@ -819,13 +867,20 @@ export class Link {
      * @internal
      */
     async storeSession(session: LinkSession) {
+        console.log("link.ts======================login")
         if (this.storage) {
+            console.log("session.identifier = ", session.identifier)
+            console.log("session.auth = ", session.auth)
+            const auth = formatAuth(session.auth)
+            console.log("session.chainId = ", session.chainId)
             const key = this.sessionKey(
                 session.identifier,
-                formatAuth(session.auth),
+                auth,
                 String(session.chainId)
             )
+            console.log("key = ", key)
             const data = JSON.stringify(session.serialize())
+            console.log("data = ", data)
             await this.storage.write(key, data)
             await this.touchSession(session.identifier, session.auth, session.chainId)
         }

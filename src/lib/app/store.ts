@@ -31,6 +31,10 @@ export const activeBlockchain: Readable<ChainConfig> = derived(activeSession, (s
         return chains[0]
     }
 })
+
+availableSessions.subscribe(value => {
+    console.log("availableSessions: ", value)
+})
 // activeBlockchain.subscribe(value => {
 //     console.log("subscribe=========>activeBlockchain:", value)
 // })
