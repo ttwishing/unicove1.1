@@ -3,6 +3,7 @@
 	import Loading from "./pages/loading.svelte";
 	import Dashboard from "./pages/dashboard/index.svelte";
 	import Send from "./pages/send/index.svelte";
+	import Receive from "./pages/receive/index.svelte";
 
 	import { activeSession, appReady, dashboardPage } from "$lib/app/store";
 	$: {
@@ -22,10 +23,12 @@
 		<Loading />
 	{:else if needLogin}
 		<Login />
-	{:else if "/" === $dashboardPage}
-		<Dashboard />
-	{:else}
+	{:else if "/send" === $dashboardPage}
 		<Send />
+	{:else if "/receive" === $dashboardPage}
+		<Receive />
+	{:else}
+		<Dashboard />
 	{/if}
 </main>
 

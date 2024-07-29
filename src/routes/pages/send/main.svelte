@@ -139,14 +139,7 @@
 
 <div class="container">
     {#if ![Step.Sending].includes($transferData.step)}
-        <div class="header">
-            {$transferData.step === Step.Receive
-                ? "Receive tokens"
-                : "Send tokens"}
-        </div>
-        {#if $transferData.step === Step.Receive}
-            <div class="subheader">Use your account name</div>
-        {/if}
+        <div class="header">Send tokens</div>
     {/if}
     {#if [Step.Recipient, Step.Amount, Step.Confirm].includes($transferData.step)}
         {#if $transferData.step === Step.Recipient}
@@ -185,17 +178,13 @@
         {#if $transferData.step === Step.Confirm && $transferData.quantity}
             <TransferConfirm {handleTransfer} token={$token} />
         {/if}
-        <!-- {#if $transferData.step === Step.Receive}
-            <TransferReceive />
-        {/if}
-         -->
         {#if $transferData.step === Step.Sending}
             <TransferSending token={$token} />
         {/if}
     {:else}
         No balance of this token to transfer!
     {/if}
-    {#if ![Step.Receive, Step.Sending].includes($transferData.step)}
+    {#if ![Step.Sending].includes($transferData.step)}
         <div class="controls">
             {#if $transferData.step > 1}
                 <Button on:action={handleBack} style="no-frame">

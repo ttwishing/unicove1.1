@@ -10,8 +10,7 @@ export const enum Step {
     Memo,
     Sending,
     Sent,
-    Failed,
-    Receive,
+    Failed
 }
 
 export interface TransferData {
@@ -26,3 +25,6 @@ export interface TransferData {
 }
 
 export const transferData = writable<TransferData>({ step: Step.Recipient })
+
+export const isReceivePage = writable<boolean>(false)
+

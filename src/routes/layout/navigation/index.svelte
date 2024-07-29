@@ -19,8 +19,13 @@
         },
         {
             icon: "arrow-right",
-            name: "Send & Receive",
+            name: "Send",
             path: "/send",
+        },
+        {
+            icon: "arrow-right",
+            name: "Receive",
+            path: "/receive",
         },
     ];
 </script>
