@@ -3,6 +3,7 @@
     import { derived } from "svelte/store";
     import { Asset } from "@wharfkit/antelope";
     import { Int128 } from "@wharfkit/antelope";
+    import TokenImage from "$lib/components/elements/image/token.svelte";
     import Page from "./page.svelte";
     import SegmentGroup from "$lib/components/elements/segment/group.svelte";
     import Segment from "$lib/components/elements/segment.svelte";
@@ -216,11 +217,11 @@
                             >
                         </div>
                         <div class="image">
-                            <!-- <TokenImage
+                            <TokenImage
                                 width="60"
                                 height="60"
                                 tokenKey={$systemTokenKey}
-                            /> -->
+                            />
                         </div>
                     </Segment>
                     <Segment background="image-alt">

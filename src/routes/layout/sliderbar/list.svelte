@@ -146,6 +146,9 @@
 
     .list {
         margin: 10px;
+        .add-account {
+            padding: 0, 16px;
+        }
         .network {
             .header {
                 color: var(--dark-grey);
@@ -215,7 +218,7 @@
         }
         :global(.button) {
             line-height: 1em;
-            margin: 0 16px;
+            // margin: 0 16px;
         }
     }
 

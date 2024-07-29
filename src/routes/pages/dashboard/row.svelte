@@ -84,7 +84,6 @@
                 <div class="desktop">
                     {#if transferable}
                         <Button href={$url} style="secondary">
-                            <Icon name="arrow-up" />
                             <Text>Send</Text>
                         </Button>
                     {/if}

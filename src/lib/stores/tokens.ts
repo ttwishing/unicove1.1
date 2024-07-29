@@ -33,7 +33,7 @@ export interface TokenKeyParams {
     name: NameType
 }
 
-export function tokenFromBalance(balance: Balance) {
+export function tokenFromBalance(balance: Balance): Token {
     return {
         key: balance.tokenKey,
         chainId: balance.chainId,

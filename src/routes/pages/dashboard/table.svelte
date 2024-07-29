@@ -15,6 +15,9 @@
     export let delegatedTokens: Readable<number>;
     export let rexTokens: Readable<number>;
 
+    /**
+     * other tokens
+     */
     const records: Readable<Balance[] | undefined> = derived(
         [activeSession, balances, systemTokenKey],
         ([$activeSession, $balances, $systemTokenKey]) => {
@@ -82,17 +85,17 @@
 <div class="records">
     <TokenHeaderRow />
     {#if $systemTokenBalance}
-        balance: <TokenRow balance={$systemTokenBalance} />
+        <TokenRow balance={$systemTokenBalance} />
     {/if}
     {#if $stakedBalance && $systemToken}
-        staked: <TokenRow
+        <TokenRow
             balance={$stakedBalance}
             name={`${$systemToken.name} (Staked)`}
             transferable={false}
         />
     {/if}
     {#if $rexBalance && $systemToken}
-        rex: <TokenRow
+        <TokenRow
             balance={$rexBalance}
             name={`${$systemToken.name} (REX)`}
             transferable={false}
