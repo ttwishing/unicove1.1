@@ -16,7 +16,7 @@
 
     import { balances } from "$lib/stores/balances";
     import { stateREX } from "$lib/stores/resources";
-    import { delegations } from "../delegations/delegations";
+    import { delegations } from "$lib/stores/delegations";
 
     import TokenTable from "./table.svelte";
     import Number from "./number.svelte";
