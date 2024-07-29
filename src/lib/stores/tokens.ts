@@ -70,6 +70,10 @@ export const tokens: Writable<Token[]> = writable(initialTokens, () => {
     }
 })
 
+tokens.subscribe(value => {
+    console.log("#######################tokens = ", tokens)
+})
+
 export function makeTokenKey(token: TokenKeyParams): string {
     return [String(token.chainId), String(token.contract), String(token.name)]
         .join('-')
@@ -133,8 +137,9 @@ export function loadTokenMetadata(session: LinkSession) {
     const allTokens = [...AntelopeTokens, ...EvmTokens]
 
     const chain = chainConfig(session.chainId)
-
+    console.log("#####################chain = ", chain.id)
     for (const t of allTokens) {
+        console.log("###########t = ", t, t.chain)
         if (chain.id === t.chain) {
             if (t.supply && t.supply.precision && t.symbol) {
                 const symbol: Asset.Symbol = Asset.Symbol.from(`${t.supply.precision},${t.symbol}`)
@@ -145,11 +150,13 @@ export function loadTokenMetadata(session: LinkSession) {
                     name: t.metadata.name,
                     logo: t.metadata.logo,
                 }
+                console.log("#####token = ", token)
 
                 if (
                     token.symbol.equals(sysToken.symbol) &&
                     token.name !== `${sysToken.name} (EVM)`
                 ) {
+                    console.log("###continue")
                     continue
                 }
 

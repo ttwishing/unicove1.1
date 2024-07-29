@@ -31,26 +31,27 @@
     };
 
     async function validateExistence(value: string) {
+        console.log("validateExistence: ", value);
         if (!activeSession) {
             return;
         }
         return activeSession.client.v1.chain
             .get_account(value)
             .catch((error) => {
-                const isUnkownAccountError = error
-                    .toString()
-                    .includes("exception: unknown key");
+                // const isUnkownAccountError = error
+                //     .toString()
+                //     .includes("exception: unknown key");
 
                 if (loading) {
                     loading = false;
                 }
 
-                if (isUnkownAccountError) {
-                    throw {
-                        valid: false,
-                        message: "Account name not found.",
-                    };
-                }
+                // if (isUnkownAccountError) {
+                //     throw {
+                //         valid: false,
+                //         message: "Account name not found.",
+                //     };
+                // }
             });
     }
 </script>

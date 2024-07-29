@@ -62,6 +62,10 @@ export const activePriceTicker: Readable<number> = derived(
         })
 )
 
+activePriceTicker.subscribe(value => {
+    console.log("######################activePriceTicker = ", value)
+})
+
 export const waitForStoreValue = <StoreType>(
     store: Readable<StoreType | undefined>
 ): Promise<StoreType> => {

@@ -6,14 +6,20 @@
     import Page from "./page.svelte";
     import SegmentGroup from "$lib/components/elements/segment/group.svelte";
     import Segment from "$lib/components/elements/segment.svelte";
+    import { fiatFormat } from "$lib/utils/fiat";
 
     import { activeBlockchain, currentAccount } from "$lib/app/store";
 
-    import { systemToken, systemTokenKey } from "$lib/stores/tokens";
+    import { getToken, systemToken, systemTokenKey } from "$lib/stores/tokens";
+    import { tokens } from "$lib/stores/tokens";
+    import { activePriceTicker } from "$lib/app/store";
 
     import { balances } from "$lib/stores/balances";
-    import { stateREX } from "../resources/resources";
+    import { stateREX } from "$lib/stores/resources";
     import { delegations } from "../delegations/delegations";
+
+    import TokenTable from "./table.svelte";
+    import Number from "./number.svelte";
 
     export const handleNaviClick = null;
     /**
@@ -21,7 +27,7 @@
      *
      * cal by cpu_weight + net_weight
      */
-    const delegatedTokens = derived(
+    const delegatedTokens: Readable<number> = derived(
         [currentAccount, delegations],
         ([$currentAccount, $delegations]) => {
             let delegated = 0;
@@ -87,13 +93,12 @@
     );
 
     /**
-     * cal by balanceValue, rexValue, stakedValue
+     * balance value
      */
-    const totalSystemTokens: Readable<Asset> = derived(
-        [balances, currentAccount, delegatedTokens, rexTokens, systemTokenKey],
-        ([$balances, $currentAccount, $delegated, $rex, $systemTokenKey]) => {
-            let amount = 0;
-            //balance
+    const balanceTokens: Readable<number> = derived(
+        [balances, currentAccount],
+        ([$balances, $currentAccount]) => {
+            let balance = 0;
             if ($currentAccount) {
                 $balances
                     .filter(
@@ -103,8 +108,23 @@
                             ) && record.tokenKey === $systemTokenKey,
                     )
                     .map((record) => {
-                        amount += record.quantity.value;
+                        balance += record.quantity.value;
                     });
+            }
+            return balance;
+        },
+    );
+
+    /**
+     * cal by balanceValue, rexValue, stakedValue
+     */
+    const totalSystemTokens: Readable<Asset> = derived(
+        [balanceTokens, delegatedTokens, rexTokens],
+        ([$balanceTokens, $delegated, $rex]) => {
+            let amount = 0;
+            //balance
+            if ($balanceTokens) {
+                amount += $balanceTokens;
             }
             // staked
             if ($delegated) {
@@ -118,9 +138,64 @@
         },
     );
 
-    function sleep(delay: number) {
-        return new Promise((resolve) => setTimeout(resolve, delay));
-    }
+    const delegatedUSD: Readable<number> = derived(
+        [delegatedTokens, currentAccount, activePriceTicker],
+        ([$delegated, $currentAccount, $price]) => {
+            let value = 0;
+            if ($currentAccount && $price !== undefined) {
+                value += $delegated * $price;
+            }
+            return value;
+        },
+    );
+
+    const rexUSD: Readable<number> = derived(
+        [rexTokens, currentAccount, activePriceTicker],
+        ([$rex, $currentAccount, $price]) => {
+            let value = 0;
+            if ($currentAccount && $price !== undefined) {
+                value += $rex * $price;
+            }
+            return value;
+        },
+    );
+
+    const balanceUSD: Readable<number> = derived(
+        [balances, currentAccount],
+        ([$balances, $currentAccount]) => {
+            let value = 0;
+            if ($currentAccount) {
+                $balances
+                    .filter((record) =>
+                        record.account.equals($currentAccount.account_name),
+                    )
+                    .map((record) => {
+                        const token = getToken(record.tokenKey);
+                        if (token && token.price) {
+                            value += record.quantity.value * token.price;
+                        }
+                    });
+            }
+            return value;
+        },
+    );
+
+    const totalUsdValue: Readable<number> = derived(
+        [delegatedUSD, rexUSD, balanceUSD],
+        ([$delegated, $rex, $balances]) => {
+            let value = 0;
+            if ($delegated) {
+                value += $delegated;
+            }
+            if ($rex) {
+                value += $rex;
+            }
+            if ($balances) {
+                value += $balances;
+            }
+            return value;
+        },
+    );
 </script>
 
 <Page title="Account" subtitle="test">
@@ -152,8 +227,7 @@
                         <div class="info">
                             <span class="label">Account Value</span>
                             <span class="amount">
-                                <!-- {fiatFormat($totalUsdValue)} -->
-                                todo
+                                {fiatFormat($totalUsdValue)}
                             </span>
                             <span class="symbol">USD</span>
                         </div>
@@ -161,6 +235,7 @@
                     </Segment>
                 </SegmentGroup>
             </div>
+            <TokenTable {balances} {rexTokens} {delegatedTokens} />
         </div>
     {/if}
 </Page>

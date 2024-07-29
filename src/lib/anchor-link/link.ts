@@ -649,6 +649,7 @@ export class Link {
             },
         })
         console.log("identify_result = ", res)
+        console.log("identify_result = ", res)
         const metadata = sessionMetadata(res.payload, res.resolved.request)
         console.log("metadata = ", metadata)
         const signerKey = res.proof.recover()
