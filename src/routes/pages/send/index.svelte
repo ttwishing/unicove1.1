@@ -8,7 +8,7 @@
     import { systemTokenKey } from "$lib/stores/tokens";
 
     import Page from "../dashboard/page.svelte";
-    import TransactionForm from "./form.svelte";
+    import TransactionForm from "$lib/components/elements/form/transaction.svelte";
     import TransferMain from "./main.svelte";
 
     import { transferData } from "./transfer";

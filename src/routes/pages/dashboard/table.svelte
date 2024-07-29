@@ -33,7 +33,10 @@
         },
     );
 
-    const systemTokenBalance = derived(
+    /**
+     * systemToken
+     */
+    const systemTokenBalance: Readable<Balance | undefined> = derived(
         [activeSession, balances, systemTokenKey],
         ([$activeSession, $balances, $systemTokenKey]) => {
             if ($activeSession && $balances) {
@@ -47,7 +50,7 @@
         },
     );
 
-    const rexBalance = derived(
+    const rexBalance: Readable<Balance | undefined> = derived(
         [activeSession, rexTokens, systemToken],
         ([$activeSession, $rexTokens, $systemToken]) => {
             if ($activeSession && $rexTokens && $systemToken) {
@@ -61,7 +64,7 @@
         },
     );
 
-    const stakedBalance = derived(
+    const stakedBalance: Readable<Balance | undefined> = derived(
         [activeSession, delegatedTokens, systemToken],
         ([$activeSession, $delegatedTokens, $systemToken]) => {
             if ($activeSession && $delegatedTokens && $systemToken) {
@@ -79,17 +82,17 @@
 <div class="records">
     <TokenHeaderRow />
     {#if $systemTokenBalance}
-        <TokenRow balance={$systemTokenBalance} />
+        balance: <TokenRow balance={$systemTokenBalance} />
     {/if}
     {#if $stakedBalance && $systemToken}
-        <TokenRow
+        staked: <TokenRow
             balance={$stakedBalance}
             name={`${$systemToken.name} (Staked)`}
             transferable={false}
         />
     {/if}
     {#if $rexBalance && $systemToken}
-        <TokenRow
+        rex: <TokenRow
             balance={$rexBalance}
             name={`${$systemToken.name} (REX)`}
             transferable={false}
@@ -97,7 +100,7 @@
     {/if}
     {#if $records}
         {#each $records as balance}
-            <TokenRow {balance} />
+            other: <TokenRow {balance} />
         {/each}
     {/if}
 </div>

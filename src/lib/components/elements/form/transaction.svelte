@@ -9,13 +9,13 @@
         currentAccount,
     } from "$lib/app/store";
     import { updateAccount } from "$lib/stores/account-provider";
-    import type { FormTransaction } from "./type";
+    import type { FormTransaction } from "$lib/app/ui-types";
     import Button from "$lib/components/elements/button.svelte";
     import Form from "$lib/components/elements/form.svelte";
-    // import Icon from "$lib/components/elements/icon.svelte";
+    import Icon from "$lib/components/elements/icon.svelte";
     import Segment from "$lib/components/elements/segment.svelte";
 
-    import TxFollower from "../../tx-follower/index.svelte";
+    import TxFollower from "$lib/components/tx-follower/index.svelte";
 
     export let retryCallback: (() => void) | undefined = undefined;
     export let resetCallback: (() => void) | undefined = undefined;
@@ -27,7 +27,12 @@
 
     function refreshAccount(account_name: Name) {
         // Refresh the account data
-        updateAccount("send", account_name, $activeSession!.chainId, true);
+        updateAccount(
+            "refreshAccount",
+            account_name,
+            $activeSession!.chainId,
+            true,
+        );
     }
 
     // TODO: Needs reimplemented within transaction follower to reset the context
@@ -92,7 +97,7 @@
 {:else if error}
     <Segment background="white">
         <div class="error">
-            <!-- <Icon name="alert-circle" size="massive" /> -->
+            <Icon name="alert-circle" size="massive" />
             <h2>Transaction Failed</h2>
             <p>{errorMessage}</p>
         </div>

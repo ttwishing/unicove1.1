@@ -66,7 +66,7 @@ export async function updateAccount(portal: string, name: Name, chainId: ChainId
 export function updateActiveAccount() {
     const session = get(activeSession)
     if (!session) return
-    updateAccount(session.auth.actor, session.chainId)
+    updateAccount("updateActiveAccount", session.auth.actor, session.chainId)
 }
 
 function fetchBalance(name: Name, chainId: ChainId) {

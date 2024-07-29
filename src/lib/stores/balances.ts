@@ -92,7 +92,7 @@ export function makeBalanceKey(token: Token, account: AccountName): string {
 export async function fetchBalances(session: LinkSession | undefined, refresh = false) {
     if (session) {
         // Refresh the sessions account data
-        updateAccount(session.auth.actor, session.chainId, refresh)
+        updateAccount("fetchBalances", session.auth.actor, session.chainId, refresh)
         // Refresh balances from the balance provider
         updateBalances(session)
     }
