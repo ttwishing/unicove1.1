@@ -56,6 +56,9 @@
 
 	--main-blue: var(--lapis-lazuli);
 	--main-black: #585d6e;
+
+	--ivory: var(--cultured);
+	--sky-blue: rgba(0, 93, 172, 0.3);
 }
 
 *,

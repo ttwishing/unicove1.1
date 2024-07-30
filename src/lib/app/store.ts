@@ -10,6 +10,7 @@ import { chainConfig, chains } from './config'
 import type { ChainConfig } from './config'
 import type { EvmSession } from '$lib/evm'
 import { priceTicker } from './price-ticker'
+import { API } from '@wharfkit/antelope'
 
 export const preferences = Preferences.shared
 
@@ -41,7 +42,7 @@ availableSessions.subscribe(value => {
 //     console.log("subscribe=========>activeBlockchain:", value)
 // })
 
-export const currentAccount = derived(
+export const currentAccount: Readable<API.v1.AccountObject | undefined> = derived(
     accountProvider,
     ($accountProvider) => $accountProvider.account
 )
@@ -61,10 +62,6 @@ export const activePriceTicker: Readable<number> = derived(
             }
         })
 )
-
-activePriceTicker.subscribe(value => {
-    console.log("######################activePriceTicker = ", value)
-})
 
 export const waitForStoreValue = <StoreType>(
     store: Readable<StoreType | undefined>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import TransferReceive from "./receive.svelte";
-    import Page from "../dashboard/page.svelte";
+    import Page from "../../layout/page.svelte";
 </script>
 
 <Page divider={false}>

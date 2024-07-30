@@ -12,7 +12,7 @@
         <h2>{$currentAccount.account_name}</h2>
         <Clipboard text={$currentAccount.account_name} let:copy>
             <Button on:action={copy} style="primary">
-                <Icon name="clipboard" />
+                <!-- <Icon name="clipboard" /> -->
                 <Text>Copy to clipboard</Text>
             </Button>
         </Clipboard>

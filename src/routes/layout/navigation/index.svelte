@@ -27,6 +27,11 @@
             name: "Receive",
             path: "/receive",
         },
+        {
+            icon: "arrow-right",
+            name: "Earn",
+            path: "/earn",
+        },
     ];
 </script>
 

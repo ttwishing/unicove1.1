@@ -7,7 +7,7 @@
     import type { Token } from "$lib/stores/tokens";
     import { systemTokenKey } from "$lib/stores/tokens";
 
-    import Page from "../dashboard/page.svelte";
+    import Page from "../../layout/page.svelte";
     import TransactionForm from "$lib/components/elements/form/transaction.svelte";
     import TransferMain from "./main.svelte";
 

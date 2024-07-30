@@ -45,6 +45,7 @@
 
     const context: FormTransaction = {
         awaitAccountUpdate: (field: any) => {
+            console.log("FormTransaction===================awaitAccountUpdate");
             // Create a copy of the initial value
             const initialValue = get(field);
 
@@ -81,6 +82,7 @@
             }
         },
         setTransaction: (id: string) => {
+            console.log("FormTransaction===================setTransaction");
             transaction_id.set(id);
         },
         setTransactionError: (err: any) => {
