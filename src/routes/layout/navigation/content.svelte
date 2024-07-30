@@ -15,6 +15,7 @@
     }
 
     export let primaryNavigation: NavigationItem[] = [];
+    export let advancedNavigation: NavigationItem[] = [];
 
     function handleNaviClick(item: NavigationItem) {
         dashboardPage.set(item.path);
@@ -33,6 +34,23 @@
                 </a>
             </li>
         {/each}
+        {#if advancedNavigation.length}
+            <li class="advanced" on:click={() => {}}>
+                <span class="name">Advanced</span>
+                <span class="icon"> </span>
+            </li>
+            <li>
+                <ul>
+                    {#each advancedNavigation as item}
+                        <li>
+                            <a href="" on:click={handleNaviClick(item)}>
+                                <span class="name">{item.name}</span>
+                            </a>
+                        </li>
+                    {/each}
+                </ul>
+            </li>
+        {/if}
     </ul>
 </nav>
 
@@ -78,6 +96,7 @@
             > li {
                 border-radius: 8px;
                 margin-bottom: 8px;
+
                 a {
                     color: var(--main-blue);
                     cursor: pointer;

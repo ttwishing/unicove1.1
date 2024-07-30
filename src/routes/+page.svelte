@@ -5,6 +5,7 @@
 	import Send from "./pages/send/index.svelte";
 	import Receive from "./pages/receive/index.svelte";
 	import Earn from "./pages/earn/index.svelte";
+	import Resources from "./pages/resources/index.svelte";
 
 	import { activeSession, appReady, dashboardPage } from "$lib/app/store";
 	$: {
@@ -30,6 +31,8 @@
 		<Receive />
 	{:else if "/earn" === $dashboardPage}
 		<Earn />
+	{:else if "/resources" === $dashboardPage}
+		<Resources />
 	{:else}
 		<Dashboard />
 	{/if}

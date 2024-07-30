@@ -3,9 +3,12 @@
     import { derived } from "svelte/store";
 
     import { resourceFeatures } from "$lib/app/config";
+    import { activeBlockchain } from "$lib/app/store";
+    import { rexIsAvailable } from "$lib/utils/rex";
 
     import MediaQuery from "$lib/components/utils/media-query.svelte";
     import NavigationContent from "./content.svelte";
+    import type { NavigationItem } from "$lib/app/ui-types";
 
     export let open = false;
     export const handleNaviClick = null;
@@ -27,16 +30,46 @@
             name: "Receive",
             path: "/receive",
         },
-        {
-            icon: "arrow-right",
-            name: "Earn",
-            path: "/earn",
-        },
+        ...(rexIsAvailable($activeBlockchain)
+            ? [
+                  {
+                      icon: "dollar-sign",
+                      name: "Earn",
+                      path: "/earn",
+                  },
+              ]
+            : []),
     ];
+
+    const advancedNavigation: Readable<NavigationItem[]> = derived(
+        [activeBlockchain],
+        ([$activeBlockchain]) => {
+            // Items to include in the advanced section
+            const items: NavigationItem[] = [];
+            if ($activeBlockchain) {
+                if (
+                    Array.from($activeBlockchain.chainFeatures).some((r) =>
+                        resourceFeatures.includes(r),
+                    )
+                ) {
+                    items.push({
+                        icon: "battery-charging",
+                        name: "Resources",
+                        path: "/resources",
+                    });
+                }
+            }
+            return items;
+        },
+    );
 </script>
 
 <MediaQuery query="(max-width: 999px)" let:matches>
-    <NavigationContent {primaryNavigation} floating={matches} />
+    <NavigationContent
+        {primaryNavigation}
+        advancedNavigation={$advancedNavigation}
+        floating={matches}
+    />
 </MediaQuery>
 
 <style type="scss">
