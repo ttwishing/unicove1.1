@@ -1,10 +1,10 @@
-import { init as initAuth } from './auth'
-import { Preferences } from './preferences'
+import { init as initAuth } from '../wharfkit/auth'
+
 import { appReady } from './store'
 
 async function init() {
     try {
-        await Promise.all([initAuth(), Preferences.shared.initStorage()])
+        await Promise.all([initAuth()])
     } catch (error) {
         console.warn('Error when initializing Anchor Link', error)
     } finally {

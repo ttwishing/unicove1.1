@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { login } from "$lib/app/auth";
+    // import { login } from "$lib/app/auth";
+    import { login } from "$lib/wharfkit/auth";
     import Button from "$lib/components/elements/button.svelte";
     import Icon from "$lib/components/elements/icon.svelte";
     import Text from "$lib/components/elements/text.svelte";
@@ -35,7 +36,6 @@
 {:else}
     <div class="login">
         <Button {disabled} size="regular" {style} on:action={loginHandler}>
-            <Icon name="log-in" />
             <Text><slot /></Text>
         </Button>
     </div>

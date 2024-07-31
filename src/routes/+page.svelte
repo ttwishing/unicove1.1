@@ -7,10 +7,8 @@
 	import Earn from "./pages/earn/index.svelte";
 	import Resources from "./pages/resources/index.svelte";
 
-	import { activeSession, appReady, dashboardPage } from "$lib/app/store";
-	$: {
-		console.log("dashboardPage = ", $dashboardPage);
-	}
+	// import { activeSession, appReady, dashboardPage } from "$lib/app/store";
+	import { activeSession } from "$lib/wharfkit/auth";
 
 	$: needLogin = $activeSession === undefined;
 </script>
@@ -21,18 +19,16 @@
 </svelte:head>
 
 <main>
-	{#if !$appReady}
-		<Loading />
-	{:else if needLogin}
+	{#if needLogin}
 		<Login />
-	{:else if "/send" === $dashboardPage}
+		<!-- {:else if "/send" === $dashboardPage}
 		<Send />
 	{:else if "/receive" === $dashboardPage}
 		<Receive />
 	{:else if "/earn" === $dashboardPage}
 		<Earn />
 	{:else if "/resources" === $dashboardPage}
-		<Resources />
+		<Resources /> -->
 	{:else}
 		<Dashboard />
 	{/if}
