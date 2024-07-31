@@ -1,10 +1,10 @@
 <script lang="ts">
     export let open = false;
-    import type { SessionLike } from "$lib/app/auth";
     import List from "./list.svelte";
-    import { activate } from "$lib/app/auth";
+    import type { SerializedSession } from "@wharfkit/session";
+    import { activate } from "$lib/wharfkit/auth";
 
-    function onSelect(session: SessionLike) {
+    function onSelect(session: SerializedSession) {
         activate(session);
         open = false;
     }

@@ -1,5 +1,5 @@
 <script>
-    import { activeSession } from "$lib/app/store";
+    import { activeSession } from "$lib/wharfkit/auth";
 
     export let open = false;
 </script>
@@ -13,7 +13,7 @@
     <span class="accounts">
         <span class="text">
             {#if $activeSession}
-                {$activeSession?.auth.actor}
+                {$activeSession.actor}
             {:else}
                 Login
             {/if}

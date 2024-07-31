@@ -1,12 +1,10 @@
 <script lang="ts">
-    import { ChainId } from "@wharfkit/signing-request";
-    import { derived } from "svelte/store";
-    import type { Readable } from "svelte/store";
+    import { login, logout } from "$lib/wharfkit/auth";
 
-    import type { SessionLike } from "$lib/app/auth";
-    import { sessionEquals, login, logout } from "$lib/app/auth";
-    import { chains, chainConfig } from "$lib/app/config";
-    import { activeSession, availableSessions } from "$lib/app/store";
+    import type { SerializedSession } from "@wharfkit/session";
+    import { activeSession } from "$lib/wharfkit/auth";
+    import { availableSessionGroup } from "$lib/wharfkit/auth";
+    import { sessionEquals } from "$lib/wharfkit/auth";
 
     import Button from "$lib/components/elements/button.svelte";
     import ButtonLogin from "$lib/components/elements/button/login.svelte";
@@ -14,10 +12,10 @@
     import Segment from "$lib/components/elements/segment.svelte";
     import Text from "$lib/components/elements/text.svelte";
 
-    $: isActive = (session: SessionLike) =>
-        sessionEquals(session, $activeSession!);
+    $: isActive = (session: SerializedSession) =>
+        sessionEquals(session, $activeSession);
 
-    export let onSelect: (session: SessionLike) => void;
+    export let onSelect: (session: any) => void;
 
     function handleAdd() {
         login().catch((error: any) => {
@@ -25,45 +23,6 @@
             console.warn("unable to add account", error);
         });
     }
-
-    interface SessionGroup {
-        chainId: string;
-        name: string;
-        sessions: SessionLike[];
-    }
-
-    const getGroupings = (chainIds: string[]) =>
-        chainIds
-            .map((chainId) => {
-                const config = chainConfig(ChainId.from(chainId));
-                return {
-                    chainId,
-                    name: config.name,
-                    sessions: $availableSessions.filter(
-                        (s) => String(s.chainId) === chainId,
-                    ),
-                };
-            })
-            .sort((a: SessionGroup, b: SessionGroup) =>
-                a.name.localeCompare(b.name),
-            );
-
-    const groupings: Readable<SessionGroup[]> = derived(
-        availableSessions,
-        ($availableSessions) => {
-            if ($availableSessions) {
-                const chainIds = [
-                    ...new Set(
-                        $availableSessions.map((session) =>
-                            String(session.chainId),
-                        ),
-                    ),
-                ];
-                return getGroupings(chainIds);
-            }
-            return [];
-        },
-    );
 
     export let collapsed: any = {};
 
@@ -78,11 +37,13 @@
 
 {#if $activeSession}
     <div class="list">
-        <Button fluid style="primary" on:action={handleAdd}>
-            <!-- <Icon name="user-plus" /> -->
-            <Text>Add another account</Text>
-        </Button>
-        {#each $groupings as group}
+        <div class="add-account">
+            <Button fluid style="primary" on:action={handleAdd}>
+                <!-- <Icon name="user-plus" /> -->
+                <Text>Add another account</Text>
+            </Button>
+        </div>
+        {#each $availableSessionGroup as group}
             <div class="network">
                 <div class="header" on:click={() => toggle(group.chainId)}>
                     <Text>{group.name} ({group.sessions.length})</Text>
@@ -99,23 +60,24 @@
                                 class="icon"
                                 on:click={() => onSelect(session)}
                             >
-                                <Icon
+                                <!-- <Icon
                                     name={isActive(session)
                                         ? "user-check"
                                         : "user"}
-                                />
+                                /> -->
                             </div>
                             <div
                                 class="account"
                                 on:click={() => onSelect(session)}
                             >
-                                {session.auth.actor}
+                                {session.actor}
                             </div>
                             <div
                                 class="control"
                                 on:click={() => logout(session)}
                             >
-                                <Icon name="log-out" size="large" />
+                                logout
+                                <!-- <Icon name="log-out" size="large" /> -->
                             </div>
                         </li>
                     {/each}
@@ -124,7 +86,7 @@
         {/each}
     </div>
 {:else}
-    <div class="login">
+    <!-- <div class="login">
         <Segment>
             <div class="circular-icon">
                 <Icon size="medium" name="user-check" />
@@ -138,7 +100,7 @@
             </p>
             <ButtonLogin>Login</ButtonLogin>
         </Segment>
-    </div>
+    </div> -->
 {/if}
 
 <style lang="scss">
@@ -147,7 +109,7 @@
     .list {
         margin: 10px;
         .add-account {
-            padding: 0, 16px;
+            padding: 0 16px;
         }
         .network {
             .header {
