@@ -35,56 +35,12 @@
         return Name.from($activeBlockchain!.coreTokenContract);
     });
 
-    export const field = derived([balance], ([$balance]) => {
+    const field = derived([balance], ([$balance]) => {
         if ($balance) {
             return $balance.quantity;
         }
         return undefined;
     });
-
-    function getActionData() {
-        switch (String($tokenContract)) {
-            case "fio.token": {
-                return FIOTransfer.from({
-                    payee_public_key: $transferData.toAddress!.toLegacyString(
-                        $activeBlockchain!.coreTokenSymbol.name,
-                    ),
-                    amount:
-                        $transferData.quantity && $transferData.quantity!.units,
-                    max_fee: $txFee!.units,
-                    actor: $activeSession!.auth.actor,
-                    tpid: "tpid@greymass",
-                });
-            }
-            default: {
-                console.log("---getActionData---");
-                console.log(
-                    "from",
-                    $activeSession!.auth.actor,
-                    String($activeSession!.auth.actor),
-                );
-                console.log(
-                    "to",
-                    $transferData.toAccount,
-                    String($transferData.toAccount),
-                );
-                console.log(
-                    "quantity",
-                    $transferData.quantity,
-                    String($transferData.quantity),
-                    $transferData.quantity?.value,
-                );
-                console.log("memo = ", $transferData.memo);
-                console.log("---getActionData---");
-                return Transfer.from({
-                    from: $activeSession!.auth.actor,
-                    to: $transferData.toAccount,
-                    quantity: $transferData.quantity,
-                    memo: $transferData.memo || "",
-                });
-            }
-        }
-    }
 
     async function handleTransfer() {
         console.log("handleTransfer.......");
@@ -130,6 +86,50 @@
 
             if (context) {
                 context.setTransactionError(error);
+            }
+        }
+    }
+
+    function getActionData() {
+        switch (String($tokenContract)) {
+            case "fio.token": {
+                return FIOTransfer.from({
+                    payee_public_key: $transferData.toAddress!.toLegacyString(
+                        $activeBlockchain!.coreTokenSymbol.name,
+                    ),
+                    amount:
+                        $transferData.quantity && $transferData.quantity!.units,
+                    max_fee: $txFee!.units,
+                    actor: $activeSession!.auth.actor,
+                    tpid: "tpid@greymass",
+                });
+            }
+            default: {
+                console.log("---getActionData---");
+                console.log(
+                    "from",
+                    $activeSession!.auth.actor,
+                    String($activeSession!.auth.actor),
+                );
+                console.log(
+                    "to",
+                    $transferData.toAccount,
+                    String($transferData.toAccount),
+                );
+                console.log(
+                    "quantity",
+                    $transferData.quantity,
+                    String($transferData.quantity),
+                    $transferData.quantity?.value,
+                );
+                console.log("memo = ", $transferData.memo);
+                console.log("---getActionData---");
+                return Transfer.from({
+                    from: $activeSession!.auth.actor,
+                    to: $transferData.toAccount,
+                    quantity: $transferData.quantity,
+                    memo: $transferData.memo || "",
+                });
             }
         }
     }

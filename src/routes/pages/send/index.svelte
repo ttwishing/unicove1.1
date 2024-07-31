@@ -33,44 +33,28 @@
         ]) => {
             if ($activeSession && $systemTokenKey && $tokens) {
                 // If this transfer session data has a token key, use it first
-                if ($transferData.tokenKey) {
-                    const token = $tokens.find(
-                        (t) => t.key === $transferData.tokenKey,
-                    );
-
-                    if (token) {
-                        return token;
-                    } else {
-                        const balance = $balances.find(
-                            (b) => b.tokenKey === $transferData.tokenKey,
-                        );
-
-                        return balance && tokenFromBalance(balance);
-                    }
+                if (!$transferData.tokenKey) {
+                    return $tokens.find((t) => t.key === $systemTokenKey);
                 }
-                // If the URL has a token key, use it second
-                // if (meta) {
-                //     const params: TokenKeyParams = {
-                //         chainId: $activeBlockchain!.chainId,
-                //         contract: Name.from(meta.params.contract),
-                //         name: Name.from(meta.params.token),
-                //     };
-                //     const key = makeTokenKey(params);
-                //     const token = $tokens.find((t) => t.key === key);
+                const token = $tokens.find(
+                    (t) => t.key === $transferData.tokenKey,
+                );
 
-                //     if (token) {
-                //         return token;
-                //     }
+                if (token) {
+                    return token;
+                }
+                const balance = $balances.find(
+                    (b) => b.tokenKey === $transferData.tokenKey,
+                );
 
-                //     const balance = $balances.find((b) => b.tokenKey === key);
-
-                //     return balance && tokenFromBalance(balance);
-                // }
-                // Otherwise return the system token key
-                return $tokens.find((t) => t.key === $systemTokenKey);
+                return balance && tokenFromBalance(balance);
             }
         },
     );
+
+    token.subscribe((value) => {
+        console.log("token = ", value);
+    });
 
     const balance: Readable<Balance | undefined> = derived(
         [activeSession, balances, token],
@@ -80,6 +64,9 @@
             }
         },
     );
+    balance.subscribe((value) => {
+        console.log("balance = ", value);
+    });
 </script>
 
 <Page divider={false}>
