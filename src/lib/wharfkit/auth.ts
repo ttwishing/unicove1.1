@@ -1,4 +1,4 @@
-import { type LoginOptions, type LoginResult, type NameType, type Session } from "@wharfkit/session";
+import { ChainId, Chains, type LoginOptions, type LoginResult, type NameType, type Session } from "@wharfkit/session";
 import { Account } from "@wharfkit/account";
 import type { SerializedSession } from "@wharfkit/session";
 import { sessionKit, accountKit } from "./wharf";
@@ -27,10 +27,6 @@ export const availableSessionGroup: Readable<SessionGroup[]> = derived(
     },
 );
 
-availableSessionGroup.subscribe(value => {
-    console.log("availableSessionGroup = ", value)
-})
-
 export function sessionEquals(session: SerializedSession, activeSession?: Session): boolean {
     if (!activeSession)
         return false
@@ -46,6 +42,10 @@ export const currentAccount: Writable<Account | undefined> = writable(undefined,
     return () => {
         unsubscribe();
     }
+})
+
+currentAccount.subscribe(value => {
+    console.log("currentAccount = ", value)
 })
 
 function sleep(delay: number) {
@@ -106,7 +106,6 @@ async function loadAccount(actor: NameType) {
     const account: Account = await accountKit.load(actor)
     currentAccount.set(account)
 }
-
 
 function getGroupings(chainIds: string[]): SessionGroup[] {
     return chainIds

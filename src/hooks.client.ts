@@ -1,4 +1,4 @@
-import { initApp } from '$lib/app/main'
+import { initApp } from '$lib/wharfkit/main'
 
 initApp()
 

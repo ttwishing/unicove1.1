@@ -9,8 +9,12 @@
 
 	// import { activeSession, appReady, dashboardPage } from "$lib/app/store";
 	import { activeSession } from "$lib/wharfkit/auth";
+	import { appReady } from "$lib/wharfkit/main";
 
 	$: needLogin = $activeSession === undefined;
+	$: {
+		console.log("appReady = ", $appReady);
+	}
 </script>
 
 <svelte:head>
@@ -19,16 +23,10 @@
 </svelte:head>
 
 <main>
-	{#if needLogin}
+	{#if !$appReady}
+		<Loading />
+	{:else if needLogin}
 		<Login />
-		<!-- {:else if "/send" === $dashboardPage}
-		<Send />
-	{:else if "/receive" === $dashboardPage}
-		<Receive />
-	{:else if "/earn" === $dashboardPage}
-		<Earn />
-	{:else if "/resources" === $dashboardPage}
-		<Resources /> -->
 	{:else}
 		<Dashboard />
 	{/if}
