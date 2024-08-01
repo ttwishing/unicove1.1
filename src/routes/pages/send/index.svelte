@@ -1,20 +1,15 @@
 <script lang="ts">
-    import type { Readable } from "svelte/motion";
-    import { derived, get, writable } from "svelte/store";
-    import { activeSession } from "$lib/app/store";
-    import { balances } from "$lib/stores/balances";
-    import type { Balance } from "$lib/stores/balances";
-    import type { Token } from "$lib/stores/tokens";
-    import { systemTokenKey } from "$lib/stores/tokens";
-
+    import type { Readable } from "svelte/store";
+    import { derived } from "svelte/store";
     import Page from "../../layout/page.svelte";
     import TransactionForm from "$lib/components/elements/form/transaction.svelte";
     import TransferMain from "./main.svelte";
 
     import { transferData } from "./transfer";
-    import { tokens } from "$lib/stores/tokens";
-    import { tokenFromBalance } from "$lib/stores/tokens";
-    import Main from "./main.svelte";
+    import { activeSession } from "$lib/wharfkit/auth";
+    import { systemToken as token } from "$lib/wharfkit/tokens";
+    import { balances } from "$lib/wharfkit/balances";
+    import type { Balance } from "$lib/wharfkit/balances";
 
     function retryCallback() {}
 
@@ -22,51 +17,44 @@
 
     function resetData() {}
 
-    const token: Readable<Token | undefined> = derived(
-        [activeSession, systemTokenKey, transferData, tokens, balances],
-        ([
-            $activeSession,
-            $systemTokenKey,
-            $transferData,
-            $tokens,
-            $balances,
-        ]) => {
-            if ($activeSession && $systemTokenKey && $tokens) {
-                // If this transfer session data has a token key, use it first
-                if (!$transferData.tokenKey) {
-                    return $tokens.find((t) => t.key === $systemTokenKey);
-                }
-                const token = $tokens.find(
-                    (t) => t.key === $transferData.tokenKey,
-                );
+    // const token: Readable<Token | undefined> = derived(
+    //     [activeSession, systemTokenKey, transferData, tokens, balances],
+    //     ([
+    //         $activeSession,
+    //         $systemTokenKey,
+    //         $transferData,
+    //         $tokens,
+    //         $balances,
+    //     ]) => {
+    //         if ($activeSession && $systemTokenKey && $tokens) {
+    //             // If this transfer session data has a token key, use it first
+    //             if (!$transferData.tokenKey) {
+    //                 return $tokens.find((t) => t.key === $systemTokenKey);
+    //             }
+    //             const token = $tokens.find(
+    //                 (t) => t.key === $transferData.tokenKey,
+    //             );
 
-                if (token) {
-                    return token;
-                }
-                const balance = $balances.find(
-                    (b) => b.tokenKey === $transferData.tokenKey,
-                );
+    //             if (token) {
+    //                 return token;
+    //             }
+    //             const balance = $balances.find(
+    //                 (b) => b.tokenKey === $transferData.tokenKey,
+    //             );
 
-                return balance && tokenFromBalance(balance);
-            }
-        },
-    );
-
-    token.subscribe((value) => {
-        console.log("token = ", value);
-    });
+    //             return balance && tokenFromBalance(balance);
+    //         }
+    //     },
+    // );
 
     const balance: Readable<Balance | undefined> = derived(
         [activeSession, balances, token],
-        ([$activeSession, $currentBalances, $token]) => {
+        ([$activeSession, $balances, $token]) => {
             if ($token) {
-                return $currentBalances.find((b) => b.tokenKey === $token.key);
+                return $balances.find((b) => b.tokenKey === $token.key);
             }
         },
     );
-    balance.subscribe((value) => {
-        console.log("balance = ", value);
-    });
 </script>
 
 <Page divider={false}>

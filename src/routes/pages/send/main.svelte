@@ -10,8 +10,8 @@
     import TransferSending from "./step/sending.svelte";
 
     import { activeBlockchain, activeSession } from "$lib/app/store";
-    import type { Balance } from "$lib/stores/balances";
-    import type { Token } from "$lib/stores/tokens";
+    import type { Balance } from "$lib/wharfkit/balances";
+    import type { Token } from "$lib/wharfkit/tokens";
 
     import Button from "$lib/components/elements/button.svelte";
     import Icon from "$lib/components/elements/icon.svelte";
@@ -55,12 +55,6 @@
             const authorization: PermissionLevelType[] = [$activeSession!.auth];
             const account = get(tokenContract);
             const name = $activeBlockchain!.coreTokenTransfer;
-            const authorizationValue = authorization.map((value) =>
-                String(value),
-            );
-            console.log("authorizationValue", authorizationValue);
-            console.log("account", String(account));
-            console.log("name", String(name));
             const data = getActionData();
             // Perform the transfer
             const result = await $activeSession!.transact({
@@ -105,25 +99,6 @@
                 });
             }
             default: {
-                console.log("---getActionData---");
-                console.log(
-                    "from",
-                    $activeSession!.auth.actor,
-                    String($activeSession!.auth.actor),
-                );
-                console.log(
-                    "to",
-                    $transferData.toAccount,
-                    String($transferData.toAccount),
-                );
-                console.log(
-                    "quantity",
-                    $transferData.quantity,
-                    String($transferData.quantity),
-                    $transferData.quantity?.value,
-                );
-                console.log("memo = ", $transferData.memo);
-                console.log("---getActionData---");
                 return Transfer.from({
                     from: $activeSession!.auth.actor,
                     to: $transferData.toAccount,

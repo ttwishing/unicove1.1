@@ -1,9 +1,8 @@
 <script lang="ts">
     import Icon from "$lib/components/elements/icon.svelte";
     import TokenImage from "$lib/components/elements/image/token.svelte";
-    import type { Token } from "$lib/stores/tokens";
-
-    import { balances } from "$lib/stores/balances";
+    import type { Token } from "$lib/wharfkit/tokens";
+    import { balances } from "$lib/wharfkit/balances";
 
     export let token: Token;
     export let onClick: () => void;

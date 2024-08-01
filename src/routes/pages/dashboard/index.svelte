@@ -6,7 +6,17 @@
 
     import { systemTokenKey } from "$lib/wharfkit/tokens";
 
-    import { balanceTokens } from "$lib/wharfkit/balances";
+    import { balances } from "$lib/wharfkit/balances";
+    import { derived, type Readable } from "svelte/store";
+    import type { Asset } from "@wharfkit/antelope";
+
+    const balanceTokens: Readable<Asset | undefined> = derived(
+        balances,
+        ($balances) => {
+            return $balances.find((item) => item.tokenKey === $systemTokenKey)
+                ?.quantity;
+        },
+    );
 </script>
 
 <Page title="Account" subtitle="test">

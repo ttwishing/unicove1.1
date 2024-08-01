@@ -2,10 +2,10 @@
     import { writable } from "svelte/store";
 
     import { activeBlockchain } from "$lib/app/store";
-    import type { Token } from "$lib/stores/tokens";
+    import type { Token } from "$lib/wharfkit/tokens";
     import { tokenFromBalance, tokens } from "$lib/stores/tokens";
-    import { balances } from "$lib/stores/balances";
-    import type { Balance } from "$lib/stores/balances";
+    import { balances } from "$lib/wharfkit/balances";
+    import type { Balance } from "$lib/wharfkit/balances";
 
     import Form from "$lib/components/elements/form.svelte";
     import Input from "$lib/components/elements/input.svelte";
@@ -44,42 +44,42 @@
 
     let filteredTokens: Token[] = [];
 
-    $: {
-        if (tokenOptions) {
-            filteredTokens = showTokensWithoutBalance
-                ? tokenOptions
-                : tokenOptions.filter((token) => hasBalance(token));
-        } else {
-            filteredTokens = showTokensWithoutBalance
-                ? $tokens
-                : $balances.map((balance) => {
-                      const token = $tokens.find(
-                          (t) => t.key === balance.tokenKey,
-                      );
+    // $: {
+    //     if (tokenOptions) {
+    //         filteredTokens = showTokensWithoutBalance
+    //             ? tokenOptions
+    //             : tokenOptions.filter((token) => hasBalance(token));
+    //     } else {
+    //         filteredTokens = showTokensWithoutBalance
+    //             ? $tokens
+    //             : $balances.map((balance) => {
+    //                   const token = $tokens.find(
+    //                       (t) => t.key === balance.tokenKey,
+    //                   );
 
-                      return token || tokenFromBalance(balance);
-                  });
+    //                   return token || tokenFromBalance(balance);
+    //               });
 
-            filteredTokens =
-                filteredTokens.filter((token) => {
-                    if (token.evm && !includeEvmTokens) return false;
+    //         filteredTokens =
+    //             filteredTokens.filter((token) => {
+    //                 if (token.evm && !includeEvmTokens) return false;
 
-                    const blockchainMatches = token.chainId.equals(
-                        $activeBlockchain.chainId,
-                    );
-                    const queryExists = query.length === 0;
-                    const queryMatches = String(token.name)
-                        .toLowerCase()
-                        .includes(query.toLowerCase());
+    //                 const blockchainMatches = token.chainId.equals(
+    //                     $activeBlockchain.chainId,
+    //                 );
+    //                 const queryExists = query.length === 0;
+    //                 const queryMatches = String(token.name)
+    //                     .toLowerCase()
+    //                     .includes(query.toLowerCase());
 
-                    return (
-                        blockchainMatches &&
-                        hasBalance(token) &&
-                        (queryExists || queryMatches)
-                    );
-                }) || [];
-        }
-    }
+    //                 return (
+    //                     blockchainMatches &&
+    //                     hasBalance(token) &&
+    //                     (queryExists || queryMatches)
+    //                 );
+    //             }) || [];
+    //     }
+    // }
 
     function hasBalance(token: Token, balance?: Balance) {
         const balanceEntry =
@@ -91,7 +91,8 @@
 
 <Modal display={displayModal} hideCloseButton>
     <div on:click={() => ($displayModal = false)} class="close-button">
-        <Icon name="x" />
+        <!-- <Icon name="x" /> -->
+        x
     </div>
     <h2>Select Token</h2>
     {#if !tokenOptions}
