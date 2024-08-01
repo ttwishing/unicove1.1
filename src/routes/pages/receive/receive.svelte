@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { activeBlockchain, currentAccount } from "$lib/app/store";
+    import { activeSession, currentAccount } from "$lib/wharfkit/auth";
 
     import Button from "$lib/components/elements/button.svelte";
     import Icon from "$lib/components/elements/icon.svelte";
@@ -9,16 +9,16 @@
 
 {#if $currentAccount}
     <div class="container">
-        <h2>{$currentAccount.account_name}</h2>
-        <Clipboard text={$currentAccount.account_name} let:copy>
+        <h2>{$currentAccount.accountName}</h2>
+        <Clipboard text={$currentAccount.accountName} let:copy>
             <Button on:action={copy} style="primary">
                 <!-- <Icon name="clipboard" /> -->
                 <Text>Copy to clipboard</Text>
             </Button>
         </Clipboard>
         <p>
-            To receive tokens on {$activeBlockchain.name}, send them directly to
-            your account name as shown above.
+            To receive tokens on {$activeSession?.chain.name}, send them
+            directly to your account name as shown above.
         </p>
     </div>
 {/if}

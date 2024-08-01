@@ -30,6 +30,8 @@
 		<Login />
 	{:else if "/send" === $dashboardPage}
 		<Send />
+	{:else if "/receive" === $dashboardPage}
+		<Receive />
 	{:else}
 		<Dashboard />
 	{/if}
