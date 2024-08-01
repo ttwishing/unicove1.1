@@ -9,7 +9,7 @@
     import TransferConfirm from "./step/confirm.svelte";
     import TransferSending from "./step/sending.svelte";
 
-    import { activeBlockchain, activeSession } from "$lib/app/store";
+    import { activeSession } from "$lib/wharfkit/auth";
     import type { Balance } from "$lib/wharfkit/balances";
     import type { Token } from "$lib/wharfkit/tokens";
 
@@ -22,6 +22,8 @@
     import { transferData } from "./transfer";
     import { txFee } from "./fio";
 
+    import { send } from "$lib/wharfkit/transact";
+
     export let balance: Readable<Balance | undefined>;
     export let token: Readable<Token | undefined>;
     export let resetData: () => void;
@@ -32,7 +34,7 @@
         if ($token) {
             return Name.from($token.contract);
         }
-        return Name.from($activeBlockchain!.coreTokenContract);
+        return Name.from("eosio.token");
     });
 
     const field = derived([balance], ([$balance]) => {
@@ -51,30 +53,18 @@
         }));
 
         try {
-            console.log("auth", String($activeSession!.auth));
-            const authorization: PermissionLevelType[] = [$activeSession!.auth];
-            const account = get(tokenContract);
-            const name = $activeBlockchain!.coreTokenTransfer;
-            const data = getActionData();
             // Perform the transfer
-            const result = await $activeSession!.transact({
-                action: {
-                    authorization: authorization,
-                    account: account,
-                    name: name,
-                    data: data,
-                },
-            });
-            // Reset the form data
-            resetData();
-            // If the context exists and this is part of a FormTransaction
-            if (context) {
-                // Pass the transaction ID to the parent
-                const txid = String(result.transaction.id);
-                context.setTransaction(txid);
-                // Await an update on the field expected for this transaction
-                context.awaitAccountUpdate(field);
-            }
+            const result = await send(getActionData());
+            // // Reset the form data
+            // resetData();
+            // // If the context exists and this is part of a FormTransaction
+            // if (context) {
+            //     // Pass the transaction ID to the parent
+            //     const txid = String(result.transaction.id);
+            //     context.setTransaction(txid);
+            //     // Await an update on the field expected for this transaction
+            //     context.awaitAccountUpdate(field);
+            // }
         } catch (error) {
             console.warn("Error during transact", error);
 
@@ -84,29 +74,13 @@
         }
     }
 
-    function getActionData() {
-        switch (String($tokenContract)) {
-            case "fio.token": {
-                return FIOTransfer.from({
-                    payee_public_key: $transferData.toAddress!.toLegacyString(
-                        $activeBlockchain!.coreTokenSymbol.name,
-                    ),
-                    amount:
-                        $transferData.quantity && $transferData.quantity!.units,
-                    max_fee: $txFee!.units,
-                    actor: $activeSession!.auth.actor,
-                    tpid: "tpid@greymass",
-                });
-            }
-            default: {
-                return Transfer.from({
-                    from: $activeSession!.auth.actor,
-                    to: $transferData.toAccount,
-                    quantity: $transferData.quantity,
-                    memo: $transferData.memo || "",
-                });
-            }
-        }
+    function getActionData(): Transfer {
+        return Transfer.from({
+            from: $activeSession!.actor,
+            to: $transferData.toAccount,
+            quantity: $transferData.quantity,
+            memo: $transferData.memo || "",
+        });
     }
 
     function handleBack() {}
