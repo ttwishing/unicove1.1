@@ -56,15 +56,15 @@
             // Perform the transfer
             const result = await send(getActionData());
             // // Reset the form data
-            // resetData();
-            // // If the context exists and this is part of a FormTransaction
-            // if (context) {
-            //     // Pass the transaction ID to the parent
-            //     const txid = String(result.transaction.id);
-            //     context.setTransaction(txid);
-            //     // Await an update on the field expected for this transaction
-            //     context.awaitAccountUpdate(field);
-            // }
+            resetData();
+            // If the context exists and this is part of a FormTransaction
+            if (context) {
+                // Pass the transaction ID to the parent
+                const txid = String(result!.response!.transaction_id);
+                context.setTransaction(txid);
+                // Await an update on the field expected for this transaction
+                context.awaitAccountUpdate(field);
+            }
         } catch (error) {
             console.warn("Error during transact", error);
 
