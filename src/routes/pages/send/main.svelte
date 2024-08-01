@@ -23,6 +23,7 @@
     import { txFee } from "./fio";
 
     import { send } from "$lib/wharfkit/transact";
+    import { systemToken } from "$lib/wharfkit/tokens";
 
     export let balance: Readable<Balance | undefined>;
     export let token: Readable<Token | undefined>;
@@ -53,8 +54,15 @@
         }));
 
         try {
+            const action = {
+                authorization: [$activeSession!.permissionLevel],
+                account: $systemToken!.contract,
+                name: Name.from("transfer"),
+                data: getActionData(),
+            };
+
             // Perform the transfer
-            const result = await send(getActionData());
+            const result = await send(action);
             // // Reset the form data
             resetData();
             // If the context exists and this is part of a FormTransaction

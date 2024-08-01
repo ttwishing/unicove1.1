@@ -3,10 +3,10 @@ import { Struct } from "@wharfkit/session";
 import { Name } from "@wharfkit/session";
 import { Asset } from "@wharfkit/session";
 
-import type { AnyAction, PermissionLevelType, TransactArgs, TransactOptions, TransactResult } from "@wharfkit/session";
+import type { AnyAction, TransactArgs, TransactOptions, TransactResult } from "@wharfkit/session";
 
 import { activeSession } from "./auth";
-import { systemToken } from "./tokens";
+
 
 export async function stake(actions: AnyAction[]) {
     const args: TransactArgs = {
@@ -15,18 +15,9 @@ export async function stake(actions: AnyAction[]) {
     return await transact(args)
 }
 
-export async function send(data: Transfer) {
-    console.log("transact.ts=================send", data)
-    const authorization: PermissionLevelType[] = [
-        get(activeSession)!.permissionLevel,
-    ];
+export async function send(action: AnyAction) {
     const args: TransactArgs = {
-        action: {
-            authorization: authorization,
-            account: get(systemToken)!.contract,
-            name: Name.from("transfer"),
-            data: data,
-        }
+        action: action
     }
     return await transact(args)
 }
@@ -38,7 +29,6 @@ async function transact(args: TransactArgs, options?: TransactOptions) {
     console.log("transact_result = ", result)
     return result;
 }
-
 
 @Struct.type('transfer')
 export class Transfer extends Struct {
