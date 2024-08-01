@@ -32,6 +32,8 @@
 		<Send />
 	{:else if "/receive" === $dashboardPage}
 		<Receive />
+	{:else if "/earn" === $dashboardPage}
+		<Earn />
 	{:else}
 		<Dashboard />
 	{/if}

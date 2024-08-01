@@ -2,12 +2,13 @@
     import type { Readable, Writable } from "svelte/store";
     import { derived, writable, get } from "svelte/store";
     import { type AnyAction, Asset, Int64, Int128 } from "@wharfkit/antelope";
-    import { currentAccount } from "$lib/app/store";
-    import { activeBlockchain, activeSession } from "$lib/app/store";
-    import type { Token } from "$lib/stores/tokens";
 
-    import { systemTokenKey, tokens } from "$lib/stores/tokens";
-    import { balances } from "$lib/stores/balances";
+    import { currentAccount, activeSession } from "$lib/wharfkit/auth";
+    import type { Token } from "$lib/wharfkit/tokens";
+    import { systemTokenKey, systemToken } from "$lib/wharfkit/tokens";
+    import { balances } from "$lib/wharfkit/balances";
+
+    import { stake } from "$lib/wharfkit/transact";
 
     import { convertRexToEos, convertEosToRex } from "$lib/utils/rex";
 
@@ -25,7 +26,7 @@
     import Page from "../../layout/page.svelte";
     import TransactionForm from "$lib/components/elements/form/transaction.svelte";
 
-    import { stateREX } from "$lib/stores//resources";
+    // import { stateREX } from "$lib/stores/resources";
     import { Step } from "./types";
     import type { REXInfo } from "./types";
     import REXError from "./step/error.svelte";
@@ -46,9 +47,9 @@
     $: {
         console.log("selectedAmount = " + selectedAmount);
         console.log("selectedAction = " + selectedAction);
-        if (!rexIsAvailable($activeBlockchain)) {
-            window.location.href = window.origin;
-        }
+        // if (!rexIsAvailable($activeBlockchain)) {
+        //     window.location.href = window.origin;
+        // }
     }
 
     /**
@@ -56,38 +57,34 @@
      *
      * used to stake
      */
-    const availableSystemTokens: Readable<Asset> = derived(
-        [balances, currentAccount, systemTokenKey, activeBlockchain],
-        ([$balances, $currentAccount, $systemTokenKey, $activeBlockchain]) => {
+    const availableSystemTokens: Readable<Asset | undefined> = derived(
+        [balances, currentAccount, systemTokenKey],
+        ([$balances, $currentAccount, $systemTokenKey]) => {
             let amount = 0;
-            if ($currentAccount) {
+            if ($systemTokenKey && $currentAccount) {
                 $balances
-                    .filter(
-                        (record) =>
-                            record.account.equals(
-                                $currentAccount.account_name,
-                            ) && record.tokenKey === $systemTokenKey,
-                    )
+                    .filter((record) => record.tokenKey === $systemTokenKey)
                     .map((record) => {
                         amount += record.quantity.value;
                     });
+
+                return Asset.from(amount, $currentAccount!.systemToken);
             }
-            return Asset.from(amount, $activeBlockchain.coreTokenSymbol);
         },
     );
 
-    /**
-     * compare with systemToken(lib/stores/tokens)
-     *
-     * this have price
-     */
-    const systemToken: Readable<Token | undefined> = derived(
-        [systemTokenKey, tokens],
-        ([$systemTokenKey, $tokens]) => {
-            let token = $tokens.find((t: Token) => t.key === $systemTokenKey);
-            return token;
-        },
-    );
+    // /**
+    //  * compare with systemToken(lib/stores/tokens)
+    //  *
+    //  * this have price
+    //  */
+    // const systemToken: Readable<Token | undefined> = derived(
+    //     [systemTokenKey, tokens],
+    //     ([$systemTokenKey, $tokens]) => {
+    //         let token = $tokens.find((t: Token) => t.key === $systemTokenKey);
+    //         return token;
+    //     },
+    // );
 
     /**
      * apy
@@ -96,62 +93,59 @@
      * matured+$rexEOSBalance: used to withdraw
      */
     const rexInfo: Readable<REXInfo> = derived(
-        [currentAccount, stateREX, systemToken],
-        ([$currentAccount, $stateREX, $systemToken]) => {
+        [currentAccount, systemToken],
+        ([$currentAccount, $systemToken]) => {
             console.log("rexInfo=============================");
-            console.log("stateREX = ", $stateREX);
             let defaultZero = Asset.from(0, $systemToken!.symbol);
             let total = defaultZero;
             let savings = defaultZero;
             let matured = defaultZero;
             let apy = "";
-            const fiveYearsFromNow =
-                new Date().getTime() + 1000 * 60 * 60 * 24 * 365 * 5;
-
-            if ($stateREX && $stateREX.value) {
-                const annualReward = 31250000;
-                const totalStaked = Number($stateREX.total_lendable.value);
-                apy = ((annualReward / totalStaked) * 100).toFixed(2);
-                if ($currentAccount && $currentAccount.rex_info) {
-                    const rexBalance =
-                        $stateREX.value *
-                        $currentAccount.rex_info.rex_balance.value;
-                    // console.log("rexBalance = ", rexBalance);
-
-                    // console.log("apy = ", apy);
-                    total = convertRexToEos(
-                        $currentAccount.rex_info.rex_balance.value,
-                        $stateREX,
-                        $systemToken,
-                    );
-                    // console.log("total = ", total);
-                    matured = convertRexToEos(
-                        Asset.fromUnits(
-                            $currentAccount.rex_info.matured_rex,
-                            $currentAccount.rex_info.rex_balance.symbol,
-                        ).value,
-                        $stateREX,
-                        $systemToken,
-                    );
-                    let savingsBucket =
-                        $currentAccount.rex_info.rex_maturities.find(
-                            (maturity) =>
-                                +new Date(maturity.first!.toString()) >
-                                +fiveYearsFromNow,
-                        );
-                    if (savingsBucket) {
-                        savings = convertRexToEos(
-                            Asset.fromUnits(
-                                savingsBucket.second!,
-                                $currentAccount.rex_info.rex_balance.symbol,
-                            ).value,
-                            $stateREX,
-                            $systemToken,
-                        );
-                    }
-                }
-            }
-
+            // const fiveYearsFromNow =
+            //     new Date().getTime() + 1000 * 60 * 60 * 24 * 365 * 5;
+            // if ($currentAccount && $currentAccount.data) {
+            //     const annualReward = 31250000;
+            //     // const totalStaked = Number($stateREX.total_lendable.value);
+            //     // apy = ((annualReward / totalStaked) * 100).toFixed(2);
+            //     if ($currentAccount && $currentAccount.data.rex_info) {
+            //         const rexBalance =
+            //             $stateREX.value *
+            //             $currentAccount.data.rex_info.rex_balance.value;
+            //         // console.log("rexBalance = ", rexBalance);
+            //         // console.log("apy = ", apy);
+            //         total = convertRexToEos(
+            //             $currentAccount.data.rex_info.rex_balance.value,
+            //             $stateREX,
+            //             $systemToken,
+            //         );
+            //         // console.log("total = ", total);
+            //         matured = convertRexToEos(
+            //             Asset.fromUnits(
+            //                 $currentAccount.data.rex_info.matured_rex,
+            //                 $currentAccount.data.rex_info.rex_balance.symbol,
+            //             ).value,
+            //             $stateREX,
+            //             $systemToken,
+            //         );
+            //         let savingsBucket =
+            //             $currentAccount.data.rex_info.rex_maturities.find(
+            //                 (maturity) =>
+            //                     +new Date(maturity.first!.toString()) >
+            //                     +fiveYearsFromNow,
+            //             );
+            //         if (savingsBucket) {
+            //             savings = convertRexToEos(
+            //                 Asset.fromUnits(
+            //                     savingsBucket.second!,
+            //                     $currentAccount.data.rex_info.rex_balance
+            //                         .symbol,
+            //                 ).value,
+            //                 $stateREX,
+            //                 $systemToken,
+            //             );
+            //         }
+            //     }
+            // }
             return { apy, total, savings, matured };
         },
     );
@@ -189,22 +183,22 @@
     let unsubscribe: any = null;
 
     onMount(async () => {
-        const client = getClient($activeBlockchain.chainId);
-        unsubscribe = currentAccount.subscribe(async (account) => {
-            const result = await client.v1.chain.get_table_rows({
-                code: "eosio",
-                scope: "eosio",
-                table: "rexfund",
-                json: true,
-                lower_bound: $currentAccount?.account_name,
-                upper_bound: $currentAccount?.account_name,
-            });
-            if (result.rows.length > 0) {
-                rexEOSBalance.set(
-                    Asset.from(result.rows[0].balance, $systemToken!.symbol),
-                );
-            }
-        });
+        // const client = getClient($activeBlockchain.chainId);
+        // unsubscribe = currentAccount.subscribe(async (account) => {
+        //     const result = await client.v1.chain.get_table_rows({
+        //         code: "eosio",
+        //         scope: "eosio",
+        //         table: "rexfund",
+        //         json: true,
+        //         lower_bound: $currentAccount?.account_name,
+        //         upper_bound: $currentAccount?.account_name,
+        //     });
+        //     if (result.rows.length > 0) {
+        //         rexEOSBalance.set(
+        //             Asset.from(result.rows[0].balance, $systemToken!.symbol),
+        //         );
+        //     }
+        // });
     });
 
     onDestroy(() => {
@@ -245,16 +239,16 @@
     }
 
     // Create a derived store of the rex field we expect to be modified
-    export const rexField = derived([currentAccount], ([$currentAccount]) => {
-        if (
-            $currentAccount &&
-            $currentAccount.rex_info &&
-            $currentAccount.rex_info.rex_balance
-        ) {
-            return $currentAccount.rex_info.rex_balance;
-        }
-        return Asset.from(0, $systemToken!.symbol);
-    });
+    // export const rexField = derived([currentAccount], ([$currentAccount]) => {
+    //     if (
+    //         $currentAccount &&
+    //         $currentAccount.rex_info &&
+    //         $currentAccount.rex_info.rex_balance
+    //     ) {
+    //         return $currentAccount.rex_info.rex_balance;
+    //     }
+    //     return Asset.from(0, $systemToken!.symbol);
+    // });
 
     function resetCallback() {
         step.set(get(defaultStep));
@@ -269,16 +263,14 @@
         console.log("handleConfirm===========================");
         console.log("actions = ", actions);
         try {
-            const result = await $activeSession!.transact({
-                actions,
-            });
+            const result = await stake(actions);
             // If the context exists and this is part of a FormTransaction
             if (context) {
                 // Pass the transaction ID to the parent
-                const txid = String(result.transaction.id);
-                context.setTransaction(txid);
-                // Await an update on the field expected for this transaction
-                context.awaitAccountUpdate(rexField);
+                // const txid = String(result.response.transaction.id);
+                // context.setTransaction(txid);
+                // // Await an update on the field expected for this transaction
+                // context.awaitAccountUpdate(rexField);
             }
         } catch (e: any) {
             console.warn("Error during transact", e);
@@ -295,23 +287,25 @@
     function getActionData() {
         if (selectedAction === "Stake") {
             return getStakeAction();
-        } else if (selectedAction === "Unstake") {
-            return getUnstakeAction();
-        } else if (selectedAction === "Claim") {
-            return getClaimAction();
-        } else {
+        }
+        // else if (selectedAction === "Unstake") {
+        //     return getUnstakeAction();
+        // } else if (selectedAction === "Claim") {
+        //     return getClaimAction();
+        // }
+        else {
             throw new Error("Unknown action");
         }
     }
 
-    function getStakeAction() {
+    function getStakeAction(): AnyAction[] {
         return [
             {
-                authorization: [$activeSession!.auth],
+                authorization: [$activeSession!.permissionLevel],
                 account: "eosio",
                 name: "deposit",
                 data: REXDeposit.from({
-                    owner: $activeSession!.auth.actor,
+                    owner: $activeSession!.actor,
                     amount: Asset.from(
                         Number(selectedAmount),
                         $systemToken!.symbol,
@@ -319,11 +313,11 @@
                 }),
             },
             {
-                authorization: [$activeSession!.auth],
+                authorization: [$activeSession!.permissionLevel],
                 account: "eosio",
                 name: "buyrex",
                 data: REXBUYREX.from({
-                    from: $activeSession!.auth.actor,
+                    from: $activeSession!.actor,
                     amount: Asset.from(
                         Number(selectedAmount),
                         $systemToken!.symbol,
@@ -333,62 +327,62 @@
         ];
     }
 
-    function getUnstakeAction() {
-        let rexAmount = convertEosToRex(
-            Number(selectedAmount),
-            $stateREX,
-            $systemToken,
-        );
-        return [
-            {
-                authorization: [$activeSession!.auth],
-                account: "eosio",
-                name: "mvfrsavings",
-                data: REXWithdraw.from({
-                    owner: $activeSession!.auth.actor,
-                    amount: rexAmount,
-                }),
-            },
-        ];
-    }
+    // function getUnstakeAction() {
+    //     let rexAmount = convertEosToRex(
+    //         Number(selectedAmount),
+    //         $stateREX,
+    //         $systemToken,
+    //     );
+    //     return [
+    //         {
+    //             authorization: [$activeSession!.auth],
+    //             account: "eosio",
+    //             name: "mvfrsavings",
+    //             data: REXWithdraw.from({
+    //                 owner: $activeSession!.auth.actor,
+    //                 amount: rexAmount,
+    //             }),
+    //         },
+    //     ];
+    // }
 
-    function getClaimAction() {
-        const actions: AnyAction[] = [
-            {
-                authorization: [$activeSession!.auth],
-                account: "eosio",
-                name: "withdraw",
-                data: REXWithdraw.from({
-                    owner: $activeSession!.auth.actor,
-                    amount: Asset.from(
-                        Number(selectedAmount),
-                        $systemToken!.symbol,
-                    ),
-                }),
-            },
-        ];
+    // function getClaimAction() {
+    //     const actions: AnyAction[] = [
+    //         {
+    //             authorization: [$activeSession!.auth],
+    //             account: "eosio",
+    //             name: "withdraw",
+    //             data: REXWithdraw.from({
+    //                 owner: $activeSession!.auth.actor,
+    //                 amount: Asset.from(
+    //                     Number(selectedAmount),
+    //                     $systemToken!.symbol,
+    //                 ),
+    //             }),
+    //         },
+    //     ];
 
-        if (Number($rexEOSBalance.value) < Number(selectedAmount)) {
-            const difference =
-                Number(selectedAmount) - Number($rexEOSBalance.value);
-            const rexAmount = convertEosToRex(
-                difference,
-                $stateREX,
-                $systemToken,
-            );
-            actions.unshift({
-                authorization: [$activeSession!.auth],
-                account: "eosio",
-                name: "sellrex",
-                data: REXSELLREX.from({
-                    from: $activeSession!.auth.actor,
-                    rex: rexAmount,
-                }),
-            });
-        }
+    //     if (Number($rexEOSBalance.value) < Number(selectedAmount)) {
+    //         const difference =
+    //             Number(selectedAmount) - Number($rexEOSBalance.value);
+    //         const rexAmount = convertEosToRex(
+    //             difference,
+    //             $stateREX,
+    //             $systemToken,
+    //         );
+    //         actions.unshift({
+    //             authorization: [$activeSession!.auth],
+    //             account: "eosio",
+    //             name: "sellrex",
+    //             data: REXSELLREX.from({
+    //                 from: $activeSession!.auth.actor,
+    //                 rex: rexAmount,
+    //             }),
+    //         });
+    //     }
 
-        return actions;
-    }
+    //     return actions;
+    // }
 </script>
 
 <Page divider={$step === Step.Bootstrap || $step === Step.Overview}>

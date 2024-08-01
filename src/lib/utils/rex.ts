@@ -2,8 +2,8 @@ import type { ChainConfig } from '$lib/app/config'
 import { Asset, Int64, Int128 } from '@wharfkit/antelope';
 import type { Readable } from 'svelte/motion';
 import { REXState } from '@wharfkit/resources';
-import type { Token } from '$lib/stores/tokens';
-import { currentAccount } from '$lib/app/store';
+import type { Token } from '$lib/wharfkit/tokens';
+import { currentAccount } from '$lib/wharfkit/auth';
 import { get } from 'svelte/store';
 
 export const rexIsAvailable = (chainData: ChainConfig | undefined): boolean => {
@@ -67,5 +67,5 @@ export const convertEosToRex = (eos: number, stateREX?: REXState, token?: Token)
     //     result: [String(result), String(oR1 - oR0)],
     // })
 
-    return Asset.fromUnits(result, get(currentAccount)!.rex_info!.rex_balance.symbol)
+    return Asset.fromUnits(result, get(currentAccount)!.data.rex_info!.rex_balance.symbol)
 }

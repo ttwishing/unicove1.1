@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getContext } from "svelte";
     import type { Asset } from "@wharfkit/antelope";
-    import type { Token } from "$lib/stores/tokens";
+    import type { Token } from "$lib/wharfkit/tokens";
     import type { FormTransaction } from "$lib/app/ui-types";
 
     import Button from "$lib/components/elements/button.svelte";

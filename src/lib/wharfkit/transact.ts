@@ -3,11 +3,17 @@ import { Struct } from "@wharfkit/session";
 import { Name } from "@wharfkit/session";
 import { Asset } from "@wharfkit/session";
 
-import type { PermissionLevelType, TransactArgs, TransactOptions, TransactResult } from "@wharfkit/session";
+import type { AnyAction, PermissionLevelType, TransactArgs, TransactOptions, TransactResult } from "@wharfkit/session";
 
 import { activeSession } from "./auth";
 import { systemToken } from "./tokens";
 
+export async function stake(actions: AnyAction[]) {
+    const args: TransactArgs = {
+        actions: actions
+    }
+    return await transact(args)
+}
 
 export async function send(data: Transfer) {
     console.log("transact.ts=================send", data)
@@ -40,4 +46,11 @@ export class Transfer extends Struct {
     @Struct.field('name') to!: Name
     @Struct.field('asset') quantity!: Asset
     @Struct.field('string') memo!: string
+}
+
+
+@Struct.type('rexdeposit')
+export class REXDeposit extends Struct {
+    @Struct.field('name') owner!: Name
+    @Struct.field('asset') amount!: Asset
 }
