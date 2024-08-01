@@ -2,7 +2,7 @@
     import { createEventDispatcher } from "svelte";
 
     import { preferences } from "$lib/app/store";
-    import { dashboardPage } from "$lib/app/store";
+    import { dashboardPage } from "$lib/wharfkit/main";
 
     export let expand = true;
     export let floating = false;

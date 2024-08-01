@@ -4,6 +4,9 @@ import { Asset } from '@wharfkit/antelope'
 
 import { currentAccount } from "./auth"
 
+//fixme: kurt    staked, rex and other balances, how to cal
+
+
 /**
  * when switch account
  * 

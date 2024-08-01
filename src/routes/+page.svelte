@@ -10,6 +10,7 @@
 	// import { activeSession, appReady, dashboardPage } from "$lib/app/store";
 	import { activeSession } from "$lib/wharfkit/auth";
 	import { appReady } from "$lib/wharfkit/main";
+	import { dashboardPage } from "$lib/wharfkit/main";
 
 	$: needLogin = $activeSession === undefined;
 	$: {
@@ -27,6 +28,8 @@
 		<Loading />
 	{:else if needLogin}
 		<Login />
+	{:else if "/send" === $dashboardPage}
+		<Send />
 	{:else}
 		<Dashboard />
 	{/if}

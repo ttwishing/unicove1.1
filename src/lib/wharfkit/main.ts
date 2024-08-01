@@ -2,6 +2,7 @@ import { init as initAuth } from './auth'
 import { writable } from 'svelte/store'
 
 export const appReady = writable<boolean>(false)
+export const dashboardPage = writable<string>("/")
 
 async function init() {
     try {
