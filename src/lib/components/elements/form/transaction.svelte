@@ -26,7 +26,7 @@
 
     function refreshAccount(account_name: Name) {
         // Refresh the account data
-        updateAccount(account_name, String($activeSession!.chain.id), true);
+        updateAccount(account_name, $activeSession!.chain, true);
     }
 
     // TODO: Needs reimplemented within transaction follower to reset the context

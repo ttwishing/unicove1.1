@@ -22,7 +22,7 @@
     import { transferData } from "./transfer";
     import { txFee } from "./fio";
 
-    import { send } from "$lib/wharfkit/transact";
+    import { send, type TransferData } from "$lib/wharfkit/transact";
     import { systemToken } from "$lib/wharfkit/stores/tokens";
 
     export let balance: Readable<Balance | undefined>;
@@ -54,15 +54,14 @@
         }));
 
         try {
-            const action = {
-                authorization: [$activeSession!.permissionLevel],
-                account: $systemToken!.contract,
-                name: Name.from("transfer"),
-                data: getActionData(),
-            };
-
+            // const action = {
+            //     authorization: [$activeSession!.permissionLevel],
+            //     account: $systemToken!.contract,
+            //     name: Name.from("transfer"),
+            //     data: getActionData(),
+            // };
             // Perform the transfer
-            const result = await send(action);
+            const result = await send(getTransferData());
             // // Reset the form data
             resetData();
             // If the context exists and this is part of a FormTransaction
@@ -80,6 +79,15 @@
                 context.setTransactionError(error);
             }
         }
+    }
+
+    function getTransferData(): TransferData {
+        return {
+            from: $activeSession!.actor,
+            to: $transferData.toAccount!,
+            quantity: $transferData.quantity!,
+            memo: $transferData.memo || "",
+        };
     }
 
     function getActionData(): Transfer {

@@ -9,6 +9,7 @@ import { activeSession } from '$lib/wharfkit/store'
 import { getAccountKit } from '../wharf'
 import { Account } from '@wharfkit/account'
 import { getClient } from '../wharf'
+import type { ChainDefinition } from '@wharfkit/session'
 
 /** How old a cached account is before we update it */
 const maxAge = 60 * 1000 // ms
@@ -24,14 +25,14 @@ export const accountProvider: Writable<AccountResponse> = writable(initialAccoun
     const interval = setInterval(() => {
         const session = get(activeSession)
         if (session) {
-            updateAccount(session.actor, String(session.chain.id))
+            updateAccount(session.actor, session.chain)
         }
     }, 30000)
 
     // Subscribe to changes to the active session and update on change
     const unsubscribe = activeSession.subscribe((session) => {
         if (session) {
-            updateAccount(session.actor, String(session.chain.id))
+            updateAccount(session.actor, session.chain)
         }
     })
 
@@ -41,11 +42,11 @@ export const accountProvider: Writable<AccountResponse> = writable(initialAccoun
     }
 })
 
-export async function updateAccount(name: Name, chainId: string, refresh: boolean = false) {
+export async function updateAccount(name: Name, chain: ChainDefinition, refresh: boolean = false) {
     isLoading.set(true)
     loadAccount(
         name,
-        chainId,
+        chain,
         async (v) => {
             if (!v.account?.data.core_liquid_balance) {
                 // const assets: Asset[] | void = await fetchBalance(name, chainId).catch((err) => {
@@ -102,11 +103,11 @@ export async function storeAccount(account: API.v1.AccountObject, chainId: strin
 // fixme: kurt, how to read and write db cache
 export async function loadAccount(
     name: Name,
-    chainId: string,
+    chain: ChainDefinition,
     set: (v: AccountResponse) => void,
     refresh = false
 ) {
-    const key = accountKey(name, chainId)
+    const key = accountKey(name, String(chain.id))
     let db = await dbPromise
     let row = await db.get('account-cache', key)
     let stale = true
@@ -118,9 +119,12 @@ export async function loadAccount(
     }
     // do refresh
     if (stale || refresh) {
-        const account: Account = await getAccountKit(chainId).load(name)
+        const account: Account = await getAccountKit(chain).load(name)
         // const accountObj = account.data
         // await storeAccount(accountObj, chainId)
+        console.log("account.accountName", String(account.accountName))
+        console.log("account.token.contract.account", String(account.token.contract.account))
+        console.log("account.systemContract.account", String(account.systemContract.account))
         set({ account: account, stale: false })
     }
 }

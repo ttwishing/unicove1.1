@@ -23,11 +23,10 @@ export const sessionKit: SessionKit = new SessionKit(seessionArgs)
 
 const accountKits = new Map<string, AccountKit>()
 
-export function getAccountKit(chainId: string): AccountKit {
+export function getAccountKit(chain: ChainDefinition): AccountKit {
+    const chainId = String(chain.id)
     let accountKit = accountKits.get(chainId)
     if (!accountKit) {
-        const indice = chainIdsToIndices.get(chainId)
-        const chain: ChainDefinition = Chains[indice as ChainIndices]
         accountKit = new AccountKit(chain, { client: getClient(chain) })
         accountKits.set(chainId, accountKit)
     }
@@ -36,11 +35,10 @@ export function getAccountKit(chainId: string): AccountKit {
 
 const contractKits = new Map<string, ContractKit>()
 
-export function getContractKit(chainId: string): ContractKit {
+export function getContractKit(chain: ChainDefinition): ContractKit {
+    const chainId = String(chain.id)
     let contractKit = contractKits.get(chainId)
     if (!contractKit) {
-        const indice = chainIdsToIndices.get(chainId)
-        const chain: ChainDefinition = Chains[indice as ChainIndices]
         contractKit = new ContractKit({
             client: getClient(chain)
         })
@@ -49,10 +47,6 @@ export function getContractKit(chainId: string): ContractKit {
     return contractKit
 }
 
-export function getChain(chainId: string): ChainDefinition {
-    const indice = chainIdsToIndices.get(chainId)
-    return Chains[indice as ChainIndices]
-}
 
 const clients = new Map<string, APIClient>()
 

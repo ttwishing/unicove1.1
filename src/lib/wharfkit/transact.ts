@@ -1,11 +1,9 @@
 import { get } from "svelte/store";
-import { Struct } from "@wharfkit/session";
-import { Name } from "@wharfkit/session";
-import { Asset } from "@wharfkit/session";
+import type { NameType, AssetType } from "@wharfkit/session";
 
 import type { AnyAction, TransactArgs, TransactOptions, TransactResult } from "@wharfkit/session";
 
-import { activeSession } from "./store";
+import { activeSession, currentAccount } from "./store";
 
 
 export async function stake(actions: AnyAction[]) {
@@ -15,7 +13,13 @@ export async function stake(actions: AnyAction[]) {
     return await transact(args)
 }
 
-export async function send(action: AnyAction) {
+export async function send(data: TransferData) {
+    console.log("send=======================")
+    console.log("data = ", data)
+    if (!get(currentAccount))
+        throw new Error("No login account")
+
+    const action = get(currentAccount)!.token.contract.action("transfer", data)
     const args: TransactArgs = {
         action: action
     }
@@ -30,17 +34,9 @@ async function transact(args: TransactArgs, options?: TransactOptions) {
     return result;
 }
 
-@Struct.type('transfer')
-export class Transfer extends Struct {
-    @Struct.field('name') from!: Name
-    @Struct.field('name') to!: Name
-    @Struct.field('asset') quantity!: Asset
-    @Struct.field('string') memo!: string
-}
-
-
-@Struct.type('rexdeposit')
-export class REXDeposit extends Struct {
-    @Struct.field('name') owner!: Name
-    @Struct.field('asset') amount!: Asset
+export interface TransferData {
+    from: NameType;
+    to: NameType;
+    quantity: AssetType;
+    memo: string;
 }
