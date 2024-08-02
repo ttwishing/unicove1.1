@@ -79,12 +79,10 @@
     const balanceTokens: Readable<number> = derived(
         [coreTokenBalance],
         ([$coreTokenBalance]) => {
-            console.log("test..................0");
             let balance = 0;
             if ($coreTokenBalance) {
                 balance = $coreTokenBalance.quantity.value;
             }
-            console.log("test.......", balance);
             return balance;
         },
     );

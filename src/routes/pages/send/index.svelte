@@ -1,6 +1,4 @@
 <script lang="ts">
-    import type { Readable } from "svelte/store";
-    import { derived } from "svelte/store";
     import Page from "../../layout/page.svelte";
     import TransactionForm from "$lib/components/elements/form/transaction.svelte";
     import TransferMain from "./main.svelte";
@@ -11,14 +9,24 @@
     //use systemToken and coreBalance
     import { systemToken as token } from "$lib/wharfkit/stores/tokens";
     import { coreTokenBalance as balance } from "$lib/wharfkit/stores/balances";
-    import { balances } from "$lib/wharfkit/stores/balances";
-    import type { Balance } from "$lib/wharfkit/stores/balances";
+    import { Step } from "./transfer";
 
-    function retryCallback() {}
+    function resetData() {
+        transferData.set({
+            step: Step.Recipient,
+        });
+        // fetchTxFee();
+    }
 
-    function resetCallback() {}
+    function retryCallback() {
+        // Upon retry, move back to the confirm step to allow the user to retry
+        $transferData.step = Step.Confirm;
+    }
 
-    function resetData() {}
+    function resetCallback() {
+        // Upon retry, move back to the confirm step to allow the user to retry
+        $transferData.step = Step.Recipient;
+    }
 
     // const token: Readable<Token | undefined> = derived(
     //     [activeSession, systemTokenKey, transferData, tokens, balances],

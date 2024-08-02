@@ -2,7 +2,7 @@
     import Icon from "$lib/components/elements/icon.svelte";
     import TokenImage from "$lib/components/elements/image/token.svelte";
     import type { Token } from "$lib/wharfkit/stores/tokens";
-    // import { balances } from "$lib/wharfkit/stores/balances";
+    import { coreTokenBalance } from "$lib/wharfkit/stores/balances";
 
     export let token: Token;
     export let onClick: () => void;
@@ -13,30 +13,27 @@
     let balance;
 
     $: {
-        // if (token.balance) {
-        //     balance = token.balance;
-        // } else {
-        //     balance =
-        //         $balances &&
-        //         $balances.find((balance) => balance.tokenKey === token.key)
-        //             ?.quantity;
-        // }
-        // if (typeof balance === "string") {
-        //     formattedTokenBalance = balance;
-        // } else if (balance) {
-        //     const tokenPrecision = balance.symbol.precision;
-        //     const unitValue = balance.units.value;
-        //     const fullTokenBalanceString = (
-        //         Number(unitValue) / Math.pow(10, tokenPrecision)
-        //     ).toFixed(tokenPrecision);
-        //     if (isTableRow) {
-        //         formattedTokenBalance = formatBalanceString(
-        //             fullTokenBalanceString,
-        //         );
-        //     } else {
-        //         formattedTokenBalance = fullTokenBalanceString;
-        //     }
-        // }
+        if (token.balance) {
+            balance = token.balance;
+        } else {
+            balance = $coreTokenBalance && $coreTokenBalance.quantity;
+        }
+        if (typeof balance === "string") {
+            formattedTokenBalance = balance;
+        } else if (balance) {
+            const tokenPrecision = balance.symbol.precision;
+            const unitValue = balance.units.value;
+            const fullTokenBalanceString = (
+                Number(unitValue) / Math.pow(10, tokenPrecision)
+            ).toFixed(tokenPrecision);
+            if (isTableRow) {
+                formattedTokenBalance = formatBalanceString(
+                    fullTokenBalanceString,
+                );
+            } else {
+                formattedTokenBalance = fullTokenBalanceString;
+            }
+        }
     }
 
     function formatBalanceString(balanceString: string) {

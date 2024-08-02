@@ -2,8 +2,9 @@ import { APIClient, BlockTimestamp, Checksum256, Struct, UInt32 } from '@wharfki
 import type { AnyAction } from '@wharfkit/antelope'
 import { readable, ReadableResult } from 'svelte-result-store'
 
-import { getClient } from '$lib/app/api-client'
+import { getClient } from '$lib/wharfkit/wharf'
 import type { ChainConfig } from '$lib/app/config'
+import type { ChainDefinition } from '@wharfkit/session'
 
 export interface TransactionStatus {
     status: 'pending' | 'executed' | 'irreversible'
@@ -13,7 +14,7 @@ export interface TransactionStatus {
     until_irreversible?: number
 }
 
-export function followTransaction(id: Checksum256, chain: ChainConfig) {
+export function followTransaction(id: Checksum256, chain: ChainDefinition) {
     const client = getClient(chain)
     const ctx: PollContext = { interval: 10 * 1000 }
     const tx = pollStore(null, () => getTransaction(id, client), ctx)

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { ChainConfig } from "$lib/app/config";
     import type { Checksum256Type } from "@wharfkit/antelope";
 
     import { Checksum256 } from "@wharfkit/antelope";
@@ -10,11 +9,12 @@
     import { exporerUrl, followTransaction } from "./utils";
     import Summary from "./summary.svelte";
     import Advanced from "./advanced.svelte";
+    import type { ChainDefinition } from "@wharfkit/session";
 
     /** The transaction id to follow */
     export let id: Checksum256Type;
     /** The chain where the transaction was submitted */
-    export let chain: ChainConfig;
+    export let chain: ChainDefinition;
     /** Title, e.g. Tokens sent */
     export let title = "Transaction sent";
     /** The text of the primary button at the bottom of the page */

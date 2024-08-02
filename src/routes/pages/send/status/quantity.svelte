@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Asset } from "@wharfkit/antelope";
 
-    import type { Token } from "$lib/stores/tokens";
+    import type { Token } from "$lib/wharfkit/stores/tokens";
     import TokenImage from "$lib/components/elements/image/token.svelte";
     import Completed from "./template/completed.svelte";
     import { transferData, Step } from "../transfer";

@@ -91,7 +91,24 @@
         });
     }
 
-    function handleBack() {}
+    function handleBack() {
+        transferData.update((data) => ({
+            ...data,
+            step: previousStep(data.step),
+            backStep: undefined,
+        }));
+    }
+
+    function previousStep(step: Step) {
+        switch (step) {
+            case Step.Amount:
+                return Step.Recipient;
+            case Step.Confirm:
+                return Step.Amount;
+            default:
+                return Step.Recipient;
+        }
+    }
 </script>
 
 <div class="container">

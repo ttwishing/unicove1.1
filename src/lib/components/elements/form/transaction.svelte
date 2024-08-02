@@ -3,12 +3,8 @@
     import { get, writable } from "svelte/store";
     import type { Name } from "@wharfkit/antelope";
 
-    import {
-        activeBlockchain,
-        activeSession,
-        currentAccount,
-    } from "$lib/app/store";
-    import { updateAccount } from "$lib/stores/account-provider";
+    import { activeSession, currentAccount } from "$lib/wharfkit/store";
+    import { updateAccount } from "$lib/wharfkit/stores/account-provider";
     import type { FormTransaction } from "$lib/app/ui-types";
     import Button from "$lib/components/elements/button.svelte";
     import Form from "$lib/components/elements/form.svelte";
@@ -16,6 +12,7 @@
     import Segment from "$lib/components/elements/segment.svelte";
 
     import TxFollower from "$lib/components/tx-follower/index.svelte";
+    import type { Session } from "@wharfkit/session";
 
     export let retryCallback: (() => void) | undefined = undefined;
     export let resetCallback: (() => void) | undefined = undefined;
@@ -25,14 +22,11 @@
     let transaction_id = writable<string | undefined>(undefined);
     let refreshInterval: NodeJS.Timeout;
 
+    const currentSession: Session = $activeSession!;
+
     function refreshAccount(account_name: Name) {
         // Refresh the account data
-        updateAccount(
-            "refreshAccount",
-            account_name,
-            $activeSession!.chainId,
-            true,
-        );
+        updateAccount(account_name, String($activeSession!.chain.id), true);
     }
 
     // TODO: Needs reimplemented within transaction follower to reset the context
@@ -45,7 +39,6 @@
 
     const context: FormTransaction = {
         awaitAccountUpdate: (field: any) => {
-            console.log("FormTransaction===================awaitAccountUpdate");
             // Create a copy of the initial value
             const initialValue = get(field);
 
@@ -55,7 +48,7 @@
             // Start an interval to continously monitor for changes to that value
             refreshInterval = setInterval(() => {
                 // Refresh the account
-                refreshAccount($currentAccount!.account_name);
+                refreshAccount($currentAccount!.accountName);
                 // Subscribe to changes on the store passed in
                 field.subscribe((v: any) => (currentValue = v));
                 // If the store changed, stop the interval
@@ -82,7 +75,6 @@
             }
         },
         setTransaction: (id: string) => {
-            console.log("FormTransaction===================setTransaction");
             transaction_id.set(id);
         },
         setTransactionError: (err: any) => {
@@ -95,7 +87,7 @@
 </script>
 
 {#if $transaction_id}
-    <TxFollower id={$transaction_id} chain={$activeBlockchain} />
+    <TxFollower id={$transaction_id} chain={currentSession.chain} />
 {:else if error}
     <Segment background="white">
         <div class="error">
