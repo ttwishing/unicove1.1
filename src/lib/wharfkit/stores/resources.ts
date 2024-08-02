@@ -12,7 +12,7 @@ export const stateREX: Readable<REXState | undefined> = derived(
     [currentAccount],
     ([$currentAccount], set) => {
         if ($currentAccount && $currentAccount.data.rex_info) {
-            // check support rex
+            //fixme: Maybe no rex data is currently generated(account.data.rex_info), or check Chain Info
             if ($currentAccount.data.rex_info) {
                 const chain = get(activeSession)!.chain
                 getREXState(set, chain)

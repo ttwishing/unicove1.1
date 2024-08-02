@@ -145,13 +145,11 @@ export function loadTokenMetadata(session: LinkSession) {
                     name: t.metadata.name,
                     logo: t.metadata.logo,
                 }
-                console.log("#####token = ", token)
 
                 if (
                     token.symbol.equals(sysToken.symbol) &&
                     token.name !== `${sysToken.name} (EVM)`
                 ) {
-                    console.log("###continue")
                     continue
                 }
 
