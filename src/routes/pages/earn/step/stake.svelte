@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Asset } from "@wharfkit/antelope";
 
-    import type { Token } from "$lib/wharfkit/tokens";
+    import type { Token } from "$lib/wharfkit/stores/tokens";
     import type { InputResponse } from "$lib/app/ui-types";
     import Form from "$lib/components/elements/form.svelte";
 

@@ -7,8 +7,7 @@
 	import Earn from "./pages/earn/index.svelte";
 	import Resources from "./pages/resources/index.svelte";
 
-	// import { activeSession, appReady, dashboardPage } from "$lib/app/store";
-	import { activeSession } from "$lib/wharfkit/auth";
+	import { activeSession } from "$lib/wharfkit/store";
 	import { appReady } from "$lib/wharfkit/main";
 	import { dashboardPage } from "$lib/wharfkit/main";
 

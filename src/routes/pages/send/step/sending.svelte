@@ -1,7 +1,7 @@
 <script lang="ts">
     import { activeBlockchain } from "$lib/app/store";
     import { transferData } from "../transfer";
-    import type { Token } from "$lib/wharfkit/tokens";
+    import type { Token } from "$lib/wharfkit/stores/tokens";
 
     import { txFee } from "../fio";
 

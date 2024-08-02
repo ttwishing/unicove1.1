@@ -1,9 +1,9 @@
 <script lang="ts">
     import type { Readable } from "svelte/store";
     import { derived } from "svelte/store";
-    import type { Balance } from "$lib/stores/balances";
-    import type { Token } from "$lib/stores/tokens";
-    import { tokenFromBalance, tokens } from "$lib/stores/tokens";
+    import type { Balance } from "$lib/wharfkit/stores/balances";
+    import type { Token } from "$lib/wharfkit/stores/tokens";
+    // import { tokenFromBalance, tokens } from "$lib/wharfkit/stores/tokens";
 
     import Button from "$lib/components/elements/button.svelte";
     import Icon from "$lib/components/elements/icon.svelte";
@@ -11,6 +11,7 @@
     import TokenImage from "$lib/components/elements/image/token.svelte";
 
     import Number from "./number.svelte";
+    import { systemToken } from "$lib/wharfkit/stores/tokens";
 
     export let balance: Balance;
     export let name: string = "";
@@ -18,22 +19,12 @@
 
     let expanded = false;
 
-    let token: Readable<Token | undefined> = derived([tokens], ([$tokens]) => {
-        if (balance) {
-            return (
-                $tokens.find((t) => t.key === balance.tokenKey) ||
-                tokenFromBalance(balance)
-            );
-        }
-    });
+    const token: Readable<Token | undefined> = derived(
+        systemToken,
+        ($systemToken) => $systemToken,
+    );
 
-    const url = derived(token, ($token) => {
-        if ($token) {
-            return `/send/${String($token.contract).toLowerCase()}/${String(
-                $token.name,
-            ).toLowerCase()}`;
-        }
-    });
+    const url: string | undefined = undefined;
 
     function fiatFormat(value: number, precision: number = 2) {
         return new Intl.NumberFormat("en-US", {

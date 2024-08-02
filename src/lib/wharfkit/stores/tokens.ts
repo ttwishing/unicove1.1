@@ -1,6 +1,6 @@
 import type { Readable } from "svelte/motion"
 import { derived } from "svelte/store"
-import { activeSession, currentAccount } from "./auth"
+import { activeSession, currentAccount } from "../store"
 import { Name } from "@wharfkit/antelope"
 import type { NameType } from "@wharfkit/antelope"
 import { Asset } from "@wharfkit/antelope"
@@ -36,12 +36,12 @@ export const systemToken: Readable<Token | undefined> = derived([currentAccount,
     })
 
 export const systemTokenKey: Readable<string> = derived([currentAccount, activeSession],
-    ([$currentAccount, $activeSession]) => {
-        if ($currentAccount && $activeSession) {
+    ([$account, $activeSession]) => {
+        if ($account && $activeSession) {
             const params: TokenKeyParams = {
                 chainId: String($activeSession.chain.id),
-                contract: $currentAccount.token.contract.account,
-                name: $currentAccount.systemToken.name,
+                contract: $account.token.contract.account,
+                name: $account.systemToken.name,
             }
             const result = makeTokenKey(params)
             return result;

@@ -1,54 +1,31 @@
 <script lang="ts">
     import { Asset } from "@wharfkit/antelope";
-    import { derived } from "svelte/store";
+    import { derived, readable } from "svelte/store";
     import type { Readable } from "svelte/store";
-
-    import { activeSession } from "$lib/app/store";
-    import { createBalanceFromToken } from "$lib/stores/balances";
-    import type { Balance } from "$lib/stores/balances";
-    import { systemToken, systemTokenKey } from "$lib/stores/tokens";
-
     import TokenHeaderRow from "./headerrow.svelte";
     import TokenRow from "./row.svelte";
 
-    export let balances: Readable<Balance[] | undefined>;
+    import { activeSession } from "$lib/wharfkit/store";
+    import type { Balance } from "$lib/wharfkit/stores/balances";
+    import { systemToken } from "$lib/wharfkit/stores/tokens";
+
+    export let coreTokenBalance: Readable<Balance | undefined>;
     export let delegatedTokens: Readable<number>;
     export let rexTokens: Readable<number>;
 
     /**
-     * other tokens
+     * other tokens, just set empty now.
      */
-    const records: Readable<Balance[] | undefined> = derived(
-        [activeSession, balances, systemTokenKey],
-        ([$activeSession, $balances, $systemTokenKey]) => {
-            const results = [];
-            if ($activeSession && $balances) {
-                results.push(
-                    ...$balances.filter(
-                        (b) =>
-                            b.chainId.equals($activeSession.chainId) &&
-                            b.account.equals($activeSession.auth.actor) &&
-                            b.tokenKey !== $systemTokenKey,
-                    ),
-                );
-            }
-            return results;
-        },
-    );
+    const records: Readable<Balance[]> = readable([]);
 
     /**
      * systemToken
      */
     const systemTokenBalance: Readable<Balance | undefined> = derived(
-        [activeSession, balances, systemTokenKey],
-        ([$activeSession, $balances, $systemTokenKey]) => {
-            if ($activeSession && $balances) {
-                return $balances.find(
-                    (b) =>
-                        b.chainId.equals($activeSession.chainId) &&
-                        b.account.equals($activeSession.auth.actor) &&
-                        b.tokenKey === $systemTokenKey,
-                );
+        [activeSession, coreTokenBalance],
+        ([$activeSession, $coreTokenBalance]) => {
+            if ($activeSession && $coreTokenBalance) {
+                return $coreTokenBalance;
             }
         },
     );
@@ -57,12 +34,9 @@
         [activeSession, rexTokens, systemToken],
         ([$activeSession, $rexTokens, $systemToken]) => {
             if ($activeSession && $rexTokens && $systemToken) {
-                const token = createBalanceFromToken(
-                    $activeSession,
-                    $systemToken,
-                    Asset.from($rexTokens, $systemToken.symbol),
-                );
-                return token;
+                return {
+                    quantity: Asset.from($rexTokens, $systemToken.symbol),
+                };
             }
         },
     );
@@ -71,12 +45,9 @@
         [activeSession, delegatedTokens, systemToken],
         ([$activeSession, $delegatedTokens, $systemToken]) => {
             if ($activeSession && $delegatedTokens && $systemToken) {
-                const token = createBalanceFromToken(
-                    $activeSession,
-                    $systemToken,
-                    Asset.from($delegatedTokens, $systemToken.symbol),
-                );
-                return token;
+                return {
+                    quantity: Asset.from($delegatedTokens, $systemToken.symbol),
+                };
             }
         },
     );

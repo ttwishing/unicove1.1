@@ -6,10 +6,10 @@
     import TransferMain from "./main.svelte";
 
     import { transferData } from "./transfer";
-    import { activeSession } from "$lib/wharfkit/auth";
-    import { systemToken as token } from "$lib/wharfkit/tokens";
-    import { balances } from "$lib/wharfkit/balances";
-    import type { Balance } from "$lib/wharfkit/balances";
+    import { activeSession } from "$lib/wharfkit/store";
+    import { systemToken as token } from "$lib/wharfkit/stores/tokens";
+    import { balances } from "$lib/wharfkit/stores/balances";
+    import type { Balance } from "$lib/wharfkit/stores/balances";
 
     function retryCallback() {}
 

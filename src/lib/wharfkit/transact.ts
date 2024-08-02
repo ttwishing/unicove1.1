@@ -5,7 +5,7 @@ import { Asset } from "@wharfkit/session";
 
 import type { AnyAction, TransactArgs, TransactOptions, TransactResult } from "@wharfkit/session";
 
-import { activeSession } from "./auth";
+import { activeSession } from "./store";
 
 
 export async function stake(actions: AnyAction[]) {

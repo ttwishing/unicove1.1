@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { activeSession, currentAccount } from "$lib/wharfkit/auth";
+    import { activeSession, currentAccount } from "$lib/wharfkit/store";
 
     import Button from "$lib/components/elements/button.svelte";
     import Icon from "$lib/components/elements/icon.svelte";

@@ -2,10 +2,10 @@
     import { writable } from "svelte/store";
 
     import { activeBlockchain } from "$lib/app/store";
-    import type { Token } from "$lib/wharfkit/tokens";
+    import type { Token } from "$lib/wharfkit/stores/tokens";
     import { tokenFromBalance, tokens } from "$lib/stores/tokens";
-    import { balances } from "$lib/wharfkit/balances";
-    import type { Balance } from "$lib/wharfkit/balances";
+    // import { balances } from "$lib/wharfkit/stores/balances";
+    import type { Balance } from "$lib/wharfkit/stores/balances";
 
     import Form from "$lib/components/elements/form.svelte";
     import Input from "$lib/components/elements/input.svelte";
@@ -81,12 +81,12 @@
     //     }
     // }
 
-    function hasBalance(token: Token, balance?: Balance) {
-        const balanceEntry =
-            balance || $balances.find((b) => b.tokenKey === token?.key);
+    // function hasBalance(token: Token, balance?: Balance) {
+    //     const balanceEntry =
+    //         balance || $balances.find((b) => b.tokenKey === token?.key);
 
-        return !!balanceEntry?.quantity && balanceEntry.quantity.value > 0;
-    }
+    //     return !!balanceEntry?.quantity && balanceEntry.quantity.value > 0;
+    // }
 </script>
 
 <Modal display={displayModal} hideCloseButton>

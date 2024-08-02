@@ -2,8 +2,8 @@
     import { login, logout } from "$lib/wharfkit/auth";
 
     import type { SerializedSession } from "@wharfkit/session";
-    import { activeSession } from "$lib/wharfkit/auth";
-    import { availableSessionGroup } from "$lib/wharfkit/auth";
+    import { activeSession } from "$lib/wharfkit/store";
+    import { availableSessionGroup } from "$lib/wharfkit/store";
     import { sessionEquals } from "$lib/wharfkit/auth";
 
     import Button from "$lib/components/elements/button.svelte";

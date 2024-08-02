@@ -9,9 +9,9 @@
     import TransferConfirm from "./step/confirm.svelte";
     import TransferSending from "./step/sending.svelte";
 
-    import { activeSession } from "$lib/wharfkit/auth";
-    import type { Balance } from "$lib/wharfkit/balances";
-    import type { Token } from "$lib/wharfkit/tokens";
+    import { activeSession } from "$lib/wharfkit/store";
+    import type { Balance } from "$lib/wharfkit/stores/balances";
+    import type { Token } from "$lib/wharfkit/stores/tokens";
 
     import Button from "$lib/components/elements/button.svelte";
     import Icon from "$lib/components/elements/icon.svelte";
@@ -23,7 +23,7 @@
     import { txFee } from "./fio";
 
     import { send } from "$lib/wharfkit/transact";
-    import { systemToken } from "$lib/wharfkit/tokens";
+    import { systemToken } from "$lib/wharfkit/stores/tokens";
 
     export let balance: Readable<Balance | undefined>;
     export let token: Readable<Token | undefined>;

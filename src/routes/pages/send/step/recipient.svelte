@@ -4,8 +4,8 @@
     import { writable } from "svelte/store";
 
     import { activeBlockchain, activeSession } from "$lib/app/store";
-    import type { Balance } from "$lib/wharfkit/balances";
-    import type { Token } from "$lib/wharfkit/tokens";
+    import type { Balance } from "$lib/wharfkit/stores/balances";
+    import type { Token } from "$lib/wharfkit/stores/tokens";
 
     import Button from "$lib/components/elements/button.svelte";
     import InputLabel from "$lib/components/elements/input/label.svelte";

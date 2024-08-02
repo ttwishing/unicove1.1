@@ -3,18 +3,112 @@
     import Page from "../../layout/page.svelte";
     import SegmentGroup from "$lib/components/elements/segment/group.svelte";
     import Segment from "$lib/components/elements/segment.svelte";
+    import TokenTable from "./table.svelte";
 
-    import { systemTokenKey } from "$lib/wharfkit/tokens";
+    import { systemTokenKey } from "$lib/wharfkit/stores/tokens";
+    import { systemToken } from "$lib/wharfkit/stores/tokens";
 
-    import { balances } from "$lib/wharfkit/balances";
+    import { coreTokenBalance } from "$lib/wharfkit/stores/balances";
     import { derived, type Readable } from "svelte/store";
-    import type { Asset } from "@wharfkit/antelope";
+    import { Asset } from "@wharfkit/antelope";
+    import { Int128 } from "@wharfkit/antelope";
 
-    const balanceTokens: Readable<Asset | undefined> = derived(
-        balances,
-        ($balances) => {
-            return $balances.find((item) => item.tokenKey === $systemTokenKey)
-                ?.quantity;
+    import { delegations } from "$lib/wharfkit/stores/delegations";
+    import { stateREX } from "$lib/wharfkit/stores/resources";
+    import { currentAccount } from "$lib/wharfkit/store";
+
+    const delegatedTokens: Readable<number> = derived(
+        [currentAccount, delegations],
+        ([$currentAccount, $delegations]) => {
+            let delegated = 0;
+            if (
+                $currentAccount &&
+                $delegations &&
+                $delegations.rows.length > 0
+            ) {
+                $delegations.rows
+                    .filter((record) =>
+                        record.from.equals($currentAccount.accountName),
+                    )
+                    .forEach((record) => {
+                        delegated += record.cpu_weight.value;
+                        delegated += record.net_weight.value;
+                    });
+            }
+            return delegated;
+        },
+    );
+
+    const rexTokens: Readable<number> = derived(
+        [currentAccount, stateREX, systemToken],
+        ([$currentAccount, $stateREX, $systemToken]) => {
+            if (
+                $currentAccount &&
+                $currentAccount.data.rex_info &&
+                $stateREX &&
+                $stateREX.value
+            ) {
+                if ($stateREX.value === 0.0001) {
+                    const pool = $stateREX;
+                    if (!$systemToken || !pool) {
+                        return 0;
+                    }
+                    const { total_lendable, total_rex } = pool;
+                    const R1 = total_rex.units.adding(
+                        $currentAccount.data.rex_info.rex_balance.units,
+                    );
+                    const S1 = Int128.from(R1)
+                        .multiplying(total_lendable.units)
+                        .dividing(total_rex.units);
+                    const result = S1.subtracting(total_lendable.units);
+                    return Asset.fromUnits(result, $systemToken!.symbol).value;
+                } else {
+                    return (
+                        $stateREX.value *
+                        $currentAccount.data.rex_info.rex_balance.value
+                    );
+                }
+            }
+            return 0;
+        },
+    );
+
+    /**
+     * balance value
+     */
+    const balanceTokens: Readable<number> = derived(
+        [coreTokenBalance],
+        ([$coreTokenBalance]) => {
+            let balance = 0;
+            if ($coreTokenBalance) {
+                balance = $coreTokenBalance.quantity.value;
+            }
+            return balance;
+        },
+    );
+
+    /**
+     * cal by balanceValue, rexValue, stakedValue
+     */
+    const totalSystemTokens: Readable<Asset | undefined> = derived(
+        [balanceTokens, delegatedTokens, rexTokens],
+        ([$balanceTokens, $delegated, $rex]) => {
+            if ($currentAccount) {
+                let amount = 0;
+                //balance
+                if ($balanceTokens) {
+                    amount += $balanceTokens;
+                }
+                // staked
+                if ($delegated) {
+                    amount += $delegated;
+                }
+                //rex
+                if ($rex) {
+                    amount += $rex;
+                }
+                return Asset.from(amount, $currentAccount.systemToken);
+            }
         },
     );
 </script>
@@ -27,13 +121,13 @@
                     <Segment background="image">
                         <div class="info">
                             <span class="label">
-                                Total {$balanceTokens.symbol.name} Balance
+                                Total {$totalSystemTokens?.symbol.name} Balance
                             </span>
                             <span class="amount">
-                                {$balanceTokens.value}
+                                {$totalSystemTokens?.value}
                             </span>
                             <span class="symbol">
-                                {$balanceTokens.symbol.name}
+                                {$totalSystemTokens?.symbol.name}
                             </span>
                         </div>
                         <div class="image">
@@ -54,7 +148,7 @@
                     </Segment>
                 </SegmentGroup>
             </div>
-            <!-- <TokenTable {balances} {rexTokens} {delegatedTokens} /> -->
+            <TokenTable {coreTokenBalance} {rexTokens} {delegatedTokens} />
         </div>
     {/if}
 </Page>

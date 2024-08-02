@@ -1,5 +1,5 @@
 <script>
-    import { activeSession } from "$lib/wharfkit/auth";
+    import { activeSession } from "$lib/wharfkit/store";
 
     export let open = false;
 </script>
