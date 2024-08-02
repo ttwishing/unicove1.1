@@ -79,10 +79,12 @@
     const balanceTokens: Readable<number> = derived(
         [coreTokenBalance],
         ([$coreTokenBalance]) => {
+            console.log("test..................0");
             let balance = 0;
             if ($coreTokenBalance) {
                 balance = $coreTokenBalance.quantity.value;
             }
+            console.log("test.......", balance);
             return balance;
         },
     );
@@ -111,46 +113,105 @@
             }
         },
     );
+
+    // const delegatedUSD: Readable<number> = derived(
+    //     [delegatedTokens, currentAccount, activePriceTicker],
+    //     ([$delegated, $currentAccount, $price]) => {
+    //         let value = 0;
+    //         if ($currentAccount && $price !== undefined) {
+    //             value += $delegated * $price;
+    //         }
+    //         return value;
+    //     },
+    // );
+
+    // const rexUSD: Readable<number> = derived(
+    //     [rexTokens, currentAccount, activePriceTicker],
+    //     ([$rex, $currentAccount, $price]) => {
+    //         let value = 0;
+    //         if ($currentAccount && $price !== undefined) {
+    //             value += $rex * $price;
+    //         }
+    //         return value;
+    //     },
+    // );
+
+    // const balanceUSD: Readable<number> = derived(
+    //     [balances, currentAccount],
+    //     ([$balances, $currentAccount]) => {
+    //         let value = 0;
+    //         if ($currentAccount) {
+    //             $balances
+    //                 .filter((record) =>
+    //                     record.account.equals($currentAccount.account_name),
+    //                 )
+    //                 .map((record) => {
+    //                     const token = getToken(record.tokenKey);
+    //                     if (token && token.price) {
+    //                         value += record.quantity.value * token.price;
+    //                     }
+    //                 });
+    //         }
+    //         return value;
+    //     },
+    // );
+
+    // const totalUsdValue: Readable<number> = derived(
+    //     [delegatedUSD, rexUSD, balanceUSD],
+    //     ([$delegated, $rex, $balances]) => {
+    //         let value = 0;
+    //         if ($delegated) {
+    //             value += $delegated;
+    //         }
+    //         if ($rex) {
+    //             value += $rex;
+    //         }
+    //         if ($balances) {
+    //             value += $balances;
+    //         }
+    //         return value;
+    //     },
+    // );
 </script>
 
 <Page title="Account" subtitle="test">
-    {#if $balanceTokens}
-        <div class="container">
-            <div class="balances">
-                <SegmentGroup>
-                    <Segment background="image">
-                        <div class="info">
-                            <span class="label">
-                                Total {$totalSystemTokens?.symbol.name} Balance
-                            </span>
-                            <span class="amount">
-                                {$totalSystemTokens?.value}
-                            </span>
-                            <span class="symbol">
-                                {$totalSystemTokens?.symbol.name}
-                            </span>
-                        </div>
-                        <div class="image">
-                            <TokenImage
-                                width="60"
-                                height="60"
-                                tokenKey={$systemTokenKey}
-                            />
-                        </div>
-                    </Segment>
-                    <Segment background="image-alt">
-                        <div class="info">
-                            <span class="label">Account Value</span>
-                            <span class="amount"> ??? </span>
-                            <span class="symbol">USD</span>
-                        </div>
-                        <div class="icon">$</div>
-                    </Segment>
-                </SegmentGroup>
-            </div>
-            <TokenTable {coreTokenBalance} {rexTokens} {delegatedTokens} />
+    <!-- why do this check -->
+    <!-- {#if $balanceTokens} -->
+    <div class="container">
+        <div class="balances">
+            <SegmentGroup>
+                <Segment background="image">
+                    <div class="info">
+                        <span class="label">
+                            Total {$totalSystemTokens?.symbol.name} Balance
+                        </span>
+                        <span class="amount">
+                            {$totalSystemTokens?.value}
+                        </span>
+                        <span class="symbol">
+                            {$totalSystemTokens?.symbol.name}
+                        </span>
+                    </div>
+                    <div class="image">
+                        <TokenImage
+                            width="60"
+                            height="60"
+                            tokenKey={$systemTokenKey}
+                        />
+                    </div>
+                </Segment>
+                <Segment background="image-alt">
+                    <div class="info">
+                        <span class="label">Account Value</span>
+                        <span class="amount"> ??? </span>
+                        <span class="symbol">USD</span>
+                    </div>
+                    <div class="icon">$</div>
+                </Segment>
+            </SegmentGroup>
         </div>
-    {/if}
+        <TokenTable {coreTokenBalance} {rexTokens} {delegatedTokens} />
+    </div>
 </Page>
 
 <style lang="scss">

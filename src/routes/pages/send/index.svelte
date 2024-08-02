@@ -7,7 +7,10 @@
 
     import { transferData } from "./transfer";
     import { activeSession } from "$lib/wharfkit/store";
+
+    //use systemToken and coreBalance
     import { systemToken as token } from "$lib/wharfkit/stores/tokens";
+    import { coreTokenBalance as balance } from "$lib/wharfkit/stores/balances";
     import { balances } from "$lib/wharfkit/stores/balances";
     import type { Balance } from "$lib/wharfkit/stores/balances";
 
@@ -47,14 +50,14 @@
     //     },
     // );
 
-    const balance: Readable<Balance | undefined> = derived(
-        [activeSession, balances, token],
-        ([$activeSession, $balances, $token]) => {
-            if ($token) {
-                return $balances.find((b) => b.tokenKey === $token.key);
-            }
-        },
-    );
+    // const balance: Readable<Balance | undefined> = derived(
+    //     [activeSession, balances, token],
+    //     ([$activeSession, $balances, $token]) => {
+    //         if ($token) {
+    //             return $balances.find((b) => b.tokenKey === $token.key);
+    //         }
+    //     },
+    // );
 </script>
 
 <Page divider={false}>

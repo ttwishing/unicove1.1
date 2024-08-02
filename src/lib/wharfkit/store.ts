@@ -4,7 +4,7 @@ import { derived } from "svelte/store";
 import { get } from "svelte/store";
 
 import { Session } from "@wharfkit/session";
-import type { ChainDefinition, SerializedSession } from "@wharfkit/session";
+import type { SerializedSession } from "@wharfkit/session";
 import { Account } from "@wharfkit/account";
 import { chainIdsToIndices } from "@wharfkit/session";
 
@@ -58,3 +58,5 @@ interface SessionGroup {
     name: string;
     sessions: SerializedSession[];
 }
+
+
