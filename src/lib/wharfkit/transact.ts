@@ -1,12 +1,14 @@
 import { get } from "svelte/store";
-import type { NameType, AssetType } from "@wharfkit/session";
 
 import type { TransactArgs, TransactOptions, TransactResult } from "@wharfkit/session";
 
 import { activeSession, currentAccount } from "./store";
 import { Contract, type ActionsArgs } from "@wharfkit/contract";
 import { getSystemContract, getTokenContract } from "./wharf";
+import type { REXDeposit, REXBuy, REXWithdraw } from "./contracts/system"
+import type { Transfer } from "./contracts/token"
 
+// fixme: kurt, How to determine whether a chain supports an action, like ChainConfig.chainFeatures?
 
 export async function stake(deposit: REXDeposit, buy: REXBuy) {
     console.log("stake=======================")
@@ -45,7 +47,7 @@ export async function unstake(withdraw: REXWithdraw) {
     return await transact(args)
 }
 
-export async function send(data: TransferData) {
+export async function send(data: Transfer) {
     console.log("send=======================")
     console.log("data = ", data)
     if (!get(currentAccount))
@@ -70,24 +72,4 @@ async function transact(args: TransactArgs, options?: TransactOptions) {
 }
 
 
-export interface TransferData {
-    from: NameType;
-    to: NameType;
-    quantity: AssetType;
-    memo: string;
-}
 
-export interface REXDeposit {
-    owner: NameType;
-    amount: AssetType;
-}
-
-export interface REXBuy {
-    from: NameType;
-    amount: AssetType;
-}
-
-export interface REXWithdraw {
-    owner: NameType;
-    rex: AssetType;
-}
