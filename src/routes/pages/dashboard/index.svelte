@@ -17,6 +17,7 @@
     import { stateREX } from "$lib/wharfkit/stores/resources";
     import { currentAccount } from "$lib/wharfkit/store";
 
+    //delegated tokens
     const delegatedTokens: Readable<number> = derived(
         [currentAccount, delegations],
         ([$currentAccount, $delegations]) => {
@@ -39,6 +40,7 @@
         },
     );
 
+    //resource staked tokens
     const rexTokens: Readable<number> = derived(
         [currentAccount, stateREX, systemToken],
         ([$currentAccount, $stateREX, $systemToken]) => {

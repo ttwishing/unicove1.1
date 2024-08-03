@@ -11,6 +11,21 @@ import { Account } from '@wharfkit/account'
 import { getClient } from '../wharf'
 import type { ChainDefinition } from '@wharfkit/session'
 
+/**
+ * todo: kurt
+ * 1. local store compat
+ * 2. how to use Account{
+ *      client: ?
+ *      data: ？
+ *      systemContract: Contract,  //Replace the systemContract built in wharf.ts?
+ *      token:{             // Replace the tokenContract built in wharf.ts?
+ *          contract: Contract,      
+ *          contractKit: ContractKit
+ *      }
+ *      accountName: Name
+ *      systemToken: Symbol
+ * }
+ */
 /** How old a cached account is before we update it */
 const maxAge = 60 * 1000 // ms
 

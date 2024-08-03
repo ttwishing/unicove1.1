@@ -18,6 +18,7 @@ export const delegations: Readable<Delegations> = derived(
         if (
             $currentAccount
         ) {
+            //tudo
             getClient(get(activeSession)!.chain)
                 .v1.chain.get_table_rows({
                     code: "eosio",

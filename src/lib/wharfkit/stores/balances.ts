@@ -4,7 +4,7 @@ import { Asset } from '@wharfkit/antelope'
 
 import { activeSession, currentAccount } from "../store"
 
-//fixme:kurt, how to handel balanceProviders.
+//fixme:kurt, how to handle balanceProviders.
 export const balances: Readable<Balance[]> = readable([])
 
 export const coreTokenBalance: Readable<Balance | undefined> = derived(
