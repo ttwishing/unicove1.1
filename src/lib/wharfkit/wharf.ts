@@ -8,7 +8,8 @@ import { AccountKit } from "@wharfkit/account";
 import { chainIdsToIndices } from "@wharfkit/session";
 import { ChainDefinition } from "@wharfkit/session";
 import { ContractKit } from "@wharfkit/contract";
-import { APIClient } from '@wharfkit/antelope'
+import { APIClient, Name } from '@wharfkit/antelope'
+import { Contract } from "@wharfkit/contract";
 
 const walletPlugins: WalletPlugin[] = [new WalletPluginAnchor()];
 
@@ -47,6 +48,29 @@ export function getContractKit(chain: ChainDefinition): ContractKit {
     return contractKit
 }
 
+
+const systemContracts = new Map<string, Contract>()
+
+export async function getSystemContract(chain: ChainDefinition) {
+    const chainId = String(chain.id)
+    let contract = systemContracts.get(chainId)
+    if (!contract) {
+        contract = await getContractKit(chain).load(Name.from("eosio"))
+        systemContracts.set(chainId, contract)
+    }
+    return contract
+}
+
+const tokenContracts = new Map<string, Contract>()
+export async function getTokenContract(chain: ChainDefinition) {
+    const chainId = String(chain.id)
+    let contract = tokenContracts.get(chainId)
+    if (!contract) {
+        contract = await getContractKit(chain).load(Name.from("eosio.token"))
+        tokenContracts.set(chainId, contract)
+    }
+    return contract
+}
 
 const clients = new Map<string, APIClient>()
 
