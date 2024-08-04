@@ -6,9 +6,8 @@ import type { Readable, Writable } from 'svelte/store'
 
 import { dbPromise } from '$lib/app/db'
 import { activeSession } from '$lib/wharfkit/store'
-import { getAccountKit } from '../wharf'
+import { wharf } from '../wharf'
 import { Account } from '@wharfkit/account'
-import { getClient } from '../wharf'
 import type { ChainDefinition } from '@wharfkit/session'
 
 /**
@@ -134,7 +133,7 @@ export async function loadAccount(
     }
     // do refresh
     if (stale || refresh) {
-        const account: Account = await getAccountKit(chain).load(name)
+        const account: Account = await get(wharf)!.accountKit.load(name)
         // const accountObj = account.data
         // await storeAccount(accountObj, chainId)
         console.log("account.accountName", String(account.accountName))

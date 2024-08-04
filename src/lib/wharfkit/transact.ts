@@ -4,7 +4,7 @@ import type { TransactArgs, TransactOptions, TransactResult } from "@wharfkit/se
 
 import { activeSession, currentAccount } from "./store";
 import { Contract, type ActionsArgs } from "@wharfkit/contract";
-import { getSystemContract, getTokenContract } from "./wharf";
+import { wharf } from "./wharf";
 import type { REXDeposit, REXBuy, REXWithdraw } from "./contracts/system"
 import type { Transfer } from "./contracts/token"
 
@@ -12,7 +12,7 @@ import type { Transfer } from "./contracts/token"
 
 export async function stake(deposit: REXDeposit, buy: REXBuy) {
     console.log("stake=======================")
-    if (!get(activeSession))
+    if (!get(wharf))
         throw new Error("No active session")
 
     const actionArgs: ActionsArgs[] = [
@@ -24,7 +24,7 @@ export async function stake(deposit: REXDeposit, buy: REXBuy) {
             data: buy
         }
     ]
-    const contract: Contract = await getSystemContract(get(activeSession)!.chain)
+    const contract: Contract = await get(wharf)!.getSystemContract()
     const actions = contract.actions(actionArgs)
     console.log("actions = ", actions)
     const args: TransactArgs = {
@@ -35,10 +35,10 @@ export async function stake(deposit: REXDeposit, buy: REXBuy) {
 
 export async function unstake(withdraw: REXWithdraw) {
     console.log("unstake=======================")
-    if (!get(activeSession))
+    if (!get(wharf))
         throw new Error("No active session")
 
-    const contract: Contract = await getSystemContract(get(activeSession)!.chain)
+    const contract: Contract = await get(wharf)!.getSystemContract()
     const action = contract.action("mvfrsavings", withdraw)
     console.log("action = ", action)
     const args: TransactArgs = {
@@ -54,8 +54,8 @@ export async function send(data: Transfer) {
         throw new Error("No login account")
 
     // const action = get(currentAccount)!.token.contract.action("transfer", data)
-
-    const action = (await getTokenContract(get(activeSession)!.chain)).action("transfer", data)
+    const contract: Contract = await get(wharf)!.getTokenContract()
+    const action = contract.action("transfer", data)
     console.log("action = ", action)
     const args: TransactArgs = {
         action: action

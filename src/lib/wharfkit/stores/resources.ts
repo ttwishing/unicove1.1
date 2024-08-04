@@ -5,7 +5,7 @@ import { REXState, Resources } from '@wharfkit/resources'
 
 import { ChainDefinition } from '@wharfkit/session'
 import { currentAccount, activeSession } from '../store'
-import { getClient } from '../wharf'
+import { wharf } from '../wharf'
 
 // The state of the REX system
 export const stateREX: Readable<REXState | undefined> = derived(
@@ -38,7 +38,7 @@ export const getREXState = async (set: (v: any) => void, chain: ChainDefinition)
         })
 
 const getResourceClient = (chain: ChainDefinition) => {
-    const api = getClient(chain)
+    const api = get(wharf)!.client
     const options: any = { api }
     // if (chain.resourceSampleAccount) {
     //     options.sampleAccount = chain.resourceSampleAccount

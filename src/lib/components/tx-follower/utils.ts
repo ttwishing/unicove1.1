@@ -1,8 +1,9 @@
 import { APIClient, BlockTimestamp, Checksum256, Struct, UInt32 } from '@wharfkit/antelope'
 import type { AnyAction } from '@wharfkit/antelope'
 import { readable, ReadableResult } from 'svelte-result-store'
+import { get } from 'svelte/store'
 
-import { getClient } from '$lib/wharfkit/wharf'
+import { wharf } from '$lib/wharfkit/wharf'
 import type { ChainConfig } from '$lib/app/config'
 import type { ChainDefinition } from '@wharfkit/session'
 
@@ -15,7 +16,7 @@ export interface TransactionStatus {
 }
 
 export function followTransaction(id: Checksum256, chain: ChainDefinition) {
-    const client = getClient(chain)
+    const client = get(wharf)!.client
     const ctx: PollContext = { interval: 10 * 1000 }
     const tx = pollStore(null, () => getTransaction(id, client), ctx)
     return tx.map((result) => {

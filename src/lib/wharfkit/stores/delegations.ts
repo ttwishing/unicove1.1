@@ -2,7 +2,7 @@ import type { Readable } from "svelte/store";
 import { derived } from "svelte/store";
 import { get } from "svelte/store";
 import { activeSession, currentAccount } from "../store";
-import { getClient } from "../wharf";
+import { wharf } from "../wharf";
 
 import { DelegatedBandwidth } from "$lib/app/abi-types";
 
@@ -13,13 +13,11 @@ interface Delegations {
 let lastResult: any = null
 
 export const delegations: Readable<Delegations> = derived(
-    [currentAccount],
-    ([$currentAccount], set) => {
-        if (
-            $currentAccount
-        ) {
-            //tudo
-            getClient(get(activeSession)!.chain)
+    [currentAccount, wharf],
+    ([$currentAccount, $wharf], set) => {
+        if ($currentAccount && $wharf) {
+            //tudo: kurt
+            $wharf.client
                 .v1.chain.get_table_rows({
                     code: "eosio",
                     table: "delband",
