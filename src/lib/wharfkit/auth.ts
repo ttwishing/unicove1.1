@@ -1,8 +1,8 @@
 import { type LoginOptions, type LoginResult, type Session } from "@wharfkit/session";
 import type { SerializedSession, RestoreArgs } from "@wharfkit/session";
-import { sessionKit } from "./wharf";
+import { sessionKit, updateSession } from "./wharf";
 
-import { activeSession, availableSessions, currentAccount } from "./store";
+import { availableSessions } from "./store";
 
 export function sessionEquals(session: SerializedSession, activeSession?: Session): boolean {
     if (!activeSession)
@@ -15,7 +15,7 @@ export async function init() {
     let session = await sessionKit.restore()
     console.log("session = ", session)
     if (session) {
-        activeSession.set(session)
+        updateSession(session)
     }
     const list = await sessionKit.getSessions();
     availableSessions.set(list);
@@ -23,7 +23,7 @@ export async function init() {
 
 export async function login(options?: LoginOptions) {
     const result: LoginResult = await sessionKit.login(options);
-    activeSession.set(result.session)
+    updateSession(result.session)
     const list = await sessionKit.getSessions();
     availableSessions.set(list);
 }
@@ -35,7 +35,7 @@ export async function logout(target: SerializedSession) {
     if (list.length > 0) {
         await activate(list[0]);
     } else {
-        activeSession.set(undefined)
+        updateSession(undefined)
     }
 }
 
@@ -53,7 +53,7 @@ export async function activate(target: SerializedSession) {
     if (!session) {
         throw new Error('No such session')
     }
-    activeSession.set(session)
+    updateSession(session)
 }
 
 

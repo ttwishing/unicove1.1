@@ -9,7 +9,6 @@
     import TransferConfirm from "./step/confirm.svelte";
     import TransferSending from "./step/sending.svelte";
 
-    import { activeSession } from "$lib/wharfkit/store";
     import type { Balance } from "$lib/wharfkit/stores/balance-provider";
     import type { Token } from "$lib/wharfkit/stores/tokens";
 
@@ -17,13 +16,15 @@
     import Icon from "$lib/components/elements/icon.svelte";
 
     import type { FormTransaction } from "$lib/app/ui-types";
-    import { FIOTransfer, Transfer } from "$lib/app/abi-types";
+    import { FIOTransfer } from "$lib/app/abi-types";
     import { Step } from "./transfer";
-    import { transferData } from "./transfer";
-    import { txFee } from "./fio";
 
-    import { send, type TransferData } from "$lib/wharfkit/transact";
+    import { transferData } from "./transfer";
+
+    import { send } from "$lib/wharfkit/transact";
+    import type { Transfer } from "$lib/wharfkit/contracts/token";
     import { systemToken } from "$lib/wharfkit/stores/tokens";
+    import { wharf } from "$lib/wharfkit/wharf";
 
     export let balance: Readable<Balance | undefined>;
     export let token: Readable<Token | undefined>;
@@ -81,23 +82,23 @@
         }
     }
 
-    function getTransferData(): TransferData {
+    function getTransferData(): Transfer {
         return {
-            from: $activeSession!.actor,
+            from: $wharf!.actor,
             to: $transferData.toAccount!,
             quantity: $transferData.quantity!,
             memo: $transferData.memo || "",
         };
     }
 
-    function getActionData(): Transfer {
-        return Transfer.from({
-            from: $activeSession!.actor,
-            to: $transferData.toAccount,
-            quantity: $transferData.quantity,
-            memo: $transferData.memo || "",
-        });
-    }
+    // function getActionData(): Transfer {
+    //     return Transfer.from({
+    //         from: $activeSession!.actor,
+    //         to: $transferData.toAccount,
+    //         quantity: $transferData.quantity,
+    //         memo: $transferData.memo || "",
+    //     });
+    // }
 
     function handleBack() {
         transferData.update((data) => ({

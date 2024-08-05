@@ -1,6 +1,7 @@
 import type { Readable } from "svelte/motion"
 import { derived } from "svelte/store"
-import { activeSession, currentAccount } from "../store"
+import { currentAccount } from "../store"
+import { wharf } from "../wharf"
 import { Name } from "@wharfkit/antelope"
 import type { NameType } from "@wharfkit/antelope"
 import { Asset } from "@wharfkit/antelope"
@@ -17,11 +18,11 @@ export interface Token {
     evm?: boolean
 }
 
-export const systemToken: Readable<Token | undefined> = derived([currentAccount, activeSession],
-    ([$currentAccount, $activeSession]) => {
-        if ($currentAccount && $activeSession) {
+export const systemToken: Readable<Token | undefined> = derived([currentAccount, wharf],
+    ([$currentAccount, $wharf]) => {
+        if ($currentAccount && $wharf) {
             const token = {
-                chainId: String($activeSession.chain.id),
+                chainId: $wharf.chainId,
                 contract: $currentAccount.token.contract.account,
                 name: $currentAccount.systemToken.name,
                 symbol: $currentAccount.systemToken
@@ -35,11 +36,11 @@ export const systemToken: Readable<Token | undefined> = derived([currentAccount,
         return undefined
     })
 
-export const systemTokenKey: Readable<string> = derived([currentAccount, activeSession],
-    ([$account, $activeSession]) => {
-        if ($account && $activeSession) {
+export const systemTokenKey: Readable<string> = derived([currentAccount, wharf],
+    ([$account, $wharf]) => {
+        if ($account && $wharf) {
             const params: TokenKeyParams = {
-                chainId: String($activeSession.chain.id),
+                chainId: $wharf.chainId,
                 contract: $account.token.contract.account,
                 name: $account.systemToken.name,
             }

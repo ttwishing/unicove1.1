@@ -1,5 +1,5 @@
 <script>
-    import { activeSession } from "$lib/wharfkit/store";
+    import { wharf } from "$lib/wharfkit/wharf";
 
     export let open = false;
 </script>
@@ -12,8 +12,8 @@
 <div class="account-button">
     <span class="accounts">
         <span class="text">
-            {#if $activeSession}
-                {$activeSession.actor}
+            {#if $wharf}
+                {$wharf.actor}
             {:else}
                 Login
             {/if}

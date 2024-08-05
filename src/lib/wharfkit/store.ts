@@ -3,15 +3,14 @@ import type { Readable } from "svelte/store";
 import { derived } from "svelte/store";
 import { get } from "svelte/store";
 
-import { Session } from "@wharfkit/session";
 import type { SerializedSession } from "@wharfkit/session";
 import { Account } from "@wharfkit/account";
 import { chainIdsToIndices } from "@wharfkit/session";
 import { configs, type ChainConfig } from "./stores/network-provider";
-
 import { accountProvider } from "./stores/account-provider";
 
-export const activeSession = writable<Session | undefined>(undefined)
+import { wharf } from "./wharf";
+
 export const availableSessions = writable<SerializedSession[]>([])
 export const currentAccount: Readable<Account | undefined> = derived(
     accountProvider,
@@ -22,9 +21,9 @@ currentAccount.subscribe(value => {
     console.log("currentAccount = ", value)
 })
 
-export const activeChainFeatures: Readable<ChainConfig | undefined> = derived(activeSession, ($activeSession) => {
-    if ($activeSession) {
-        return configs.get(String($activeSession.chain.id))
+export const activeChainFeatures: Readable<ChainConfig | undefined> = derived(wharf, ($wharf) => {
+    if ($wharf) {
+        return configs.get($wharf.chainId)
     }
 })
 

@@ -3,7 +3,7 @@
     import { derived, writable, get } from "svelte/store";
     import { type AnyAction, Asset, Int64, Int128 } from "@wharfkit/antelope";
 
-    import { currentAccount, activeSession } from "$lib/wharfkit/store";
+    import { currentAccount } from "$lib/wharfkit/store";
     import type { Token } from "$lib/wharfkit/stores/tokens";
     import { systemTokenKey, systemToken } from "$lib/wharfkit/stores/tokens";
     import {
@@ -14,6 +14,7 @@
     import { stake, unstake } from "$lib/wharfkit/transact";
 
     import { convertRexToEos, convertEosToRex } from "$lib/utils/rex";
+    import { wharf } from "$lib/wharfkit/wharf";
 
     import {
         REXDeposit,
@@ -299,14 +300,14 @@
     function getStakeAction() {
         return {
             deposit: {
-                owner: $activeSession!.actor,
+                owner: $wharf!.actor,
                 amount: Asset.from(
                     Number(selectedAmount),
                     $systemToken!.symbol,
                 ),
             },
             buyrex: {
-                from: $activeSession!.actor,
+                from: $wharf!.actor,
                 amount: Asset.from(
                     Number(selectedAmount),
                     $systemToken!.symbol,
@@ -322,7 +323,7 @@
             $systemToken,
         );
         return {
-            owner: $activeSession!.actor,
+            owner: $wharf!.actor,
             rex: rexAmount,
         };
     }

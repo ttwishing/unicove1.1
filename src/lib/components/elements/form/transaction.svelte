@@ -3,7 +3,7 @@
     import { get, writable } from "svelte/store";
     import type { Name } from "@wharfkit/antelope";
 
-    import { activeSession, currentAccount } from "$lib/wharfkit/store";
+    import { currentAccount } from "$lib/wharfkit/store";
     import { updateAccount } from "$lib/wharfkit/stores/account-provider";
     import type { FormTransaction } from "$lib/app/ui-types";
     import Button from "$lib/components/elements/button.svelte";
@@ -12,7 +12,8 @@
     import Segment from "$lib/components/elements/segment.svelte";
 
     import TxFollower from "$lib/components/tx-follower/index.svelte";
-    import type { Session } from "@wharfkit/session";
+    import { wharf } from "$lib/wharfkit/wharf";
+    import type { WharfService } from "$lib/wharfkit/wharf";
 
     export let retryCallback: (() => void) | undefined = undefined;
     export let resetCallback: (() => void) | undefined = undefined;
@@ -22,11 +23,11 @@
     let transaction_id = writable<string | undefined>(undefined);
     let refreshInterval: NodeJS.Timeout;
 
-    const currentSession: Session = $activeSession!;
+    const currentWharf: WharfService = $wharf!;
 
     function refreshAccount(account_name: Name) {
         // Refresh the account data
-        updateAccount(account_name, $activeSession!.chain, true);
+        updateAccount(account_name, $wharf!.chain, true);
     }
 
     // TODO: Needs reimplemented within transaction follower to reset the context
@@ -87,7 +88,7 @@
 </script>
 
 {#if $transaction_id}
-    <TxFollower id={$transaction_id} chain={currentSession.chain} />
+    <TxFollower id={$transaction_id} chain={currentWharf.chain} />
 {:else if error}
     <Segment background="white">
         <div class="error">

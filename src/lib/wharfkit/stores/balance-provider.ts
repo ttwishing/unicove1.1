@@ -15,7 +15,7 @@ import { readable, writable } from "svelte/store";
 
 import { Name } from "@wharfkit/antelope";
 import { Asset } from "@wharfkit/antelope";
-import { activeSession, currentAccount } from "../store";
+import { currentAccount } from "../store";
 import { wharf } from "../wharf";
 import { WharfService } from "../wharf";
 import { configs } from "./network-provider";
@@ -47,16 +47,20 @@ export const systemTokenBalance: Readable<Balance | undefined> = derived(
 const balancesProvider: Writable<Balance[]> = writable([], (set) => {
     // Update on a set interval
     const interval = setInterval(() => {
-        const session = get(activeSession)
-        if (session) {
-            getBalances(set, session)
+        const wf = get(wharf)
+        if (wf) {
+            getBalances(set, wf)
+        } else {
+            set([])
         }
     }, 30000)
 
     // Subscribe to changes to the active session and update on change
-    const unsubscribe = activeSession.subscribe((session) => {
-        if (session) {
-            getBalances(set, session)
+    const unsubscribe = wharf.subscribe((wharf) => {
+        if (wharf) {
+            getBalances(set, wharf)
+        } else {
+            set([])
         }
     })
 
@@ -67,27 +71,21 @@ const balancesProvider: Writable<Balance[]> = writable([], (set) => {
 })
 
 
-export const balances: Readable<Balance[]> = derived([balancesProvider, activeSession],
-    ([$balancesProvider, $activeSession]) => {
-        if ($activeSession) {
-            return $balancesProvider;
-        }
-        return []
-    })
+export const balances: Readable<Balance[]> = derived([balancesProvider],
+    ([$balancesProvider]) => $balancesProvider
+)
 
-async function getBalances(set: (v: any) => void, session: Session) {
-    const chain = session.chain
-    const features = configs.get(String(chain.id))!.features
+async function getBalances(set: (v: any) => void, wharf: WharfService) {
+    const features = configs.get(wharf.chainId)!.features
     console.log("features= ", features)
     if (features.lightapi) {
-        getLightApiBalances(set, String(session.chain.id), session.actor)
+        getLightApiBalances(set, wharf.chainId, wharf.actor)
     } else if (features.bloks) {
 
     }
 }
 
 export const getLightApiBalances = async (set: (v: any) => void, chindId: string, actor: Name) => {
-    console.log("getLightApiBalances....................")
     fetchLightApiBalances(chindId, actor).then((result) => {
         set(result)
     }).catch((error) => {
@@ -97,10 +95,10 @@ export const getLightApiBalances = async (set: (v: any) => void, chindId: string
 
 
 export const delegations: Readable<DelegatedBandwidth[]> = derived(
-    [activeSession, wharf],
-    ([$activeSession, $wharf], set) => {
-        if ($activeSession && $wharf) {
-            getDeleted(set, $wharf, $activeSession.actor)
+    [wharf],
+    ([$wharf], set) => {
+        if ($wharf) {
+            getDeleted(set, $wharf, $wharf.actor)
         } else {
             set([])
         }
@@ -122,13 +120,12 @@ export const getDeleted = async (set: (v: any) => void, wharf: WharfService, act
 
 
 export const stateREX: Readable<REXState | undefined> = derived(
-    [activeSession, wharf],
-    ([$activeSession, $wharf], set) => {
-        if ($activeSession && $wharf && configs.get(String($activeSession.chain.id))!.features.rex) {
-            const chain = get(activeSession)!.chain
-            getREXState(set, $wharf, $activeSession.actor)
+    [wharf],
+    ([$wharf], set) => {
+        if ($wharf && configs.get($wharf.chainId)!.features.rex) {
+            getREXState(set, $wharf, $wharf.actor)
             const interval = setInterval(() =>
-                getREXState(set, $wharf, $activeSession.actor), 30000)
+                getREXState(set, $wharf, $wharf.actor), 30000)
             return () => {
                 clearInterval(interval)
             }

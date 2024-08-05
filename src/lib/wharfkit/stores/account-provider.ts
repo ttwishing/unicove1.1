@@ -5,8 +5,7 @@ import { get, writable } from 'svelte/store'
 import type { Readable, Writable } from 'svelte/store'
 
 import { dbPromise } from '$lib/app/db'
-import { activeSession } from '$lib/wharfkit/store'
-import { wharf } from '../wharf'
+import { wharf } from '$lib/wharfkit/wharf'
 import { Account } from '@wharfkit/account'
 import type { ChainDefinition } from '@wharfkit/session'
 
@@ -37,16 +36,16 @@ const initialAccountResponse: AccountResponse = {
 export const accountProvider: Writable<AccountResponse> = writable(initialAccountResponse, () => {
     // Update on a set interval
     const interval = setInterval(() => {
-        const session = get(activeSession)
-        if (session) {
-            updateAccount(session.actor, session.chain)
+        const wf = get(wharf)
+        if (wf) {
+            updateAccount(wf.actor, wf.chain)
         }
     }, 30000)
 
     // Subscribe to changes to the active session and update on change
-    const unsubscribe = activeSession.subscribe((session) => {
-        if (session) {
-            updateAccount(session.actor, session.chain)
+    const unsubscribe = wharf.subscribe((wharf) => {
+        if (wharf) {
+            updateAccount(wharf.actor, wharf.chain)
         }
     })
 

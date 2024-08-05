@@ -4,7 +4,7 @@
     import TransferMain from "./main.svelte";
 
     import { transferData } from "./transfer";
-    import { activeSession } from "$lib/wharfkit/store";
+    import { wharf } from "$lib/wharfkit/wharf";
 
     //use systemToken and coreBalance
     import { systemToken as token } from "$lib/wharfkit/stores/tokens";

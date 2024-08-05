@@ -7,12 +7,12 @@
 	import Earn from "./pages/earn/index.svelte";
 	import Resources from "./pages/resources/index.svelte";
 
-	import { activeSession } from "$lib/wharfkit/store";
 	import { appReady } from "$lib/wharfkit/main";
 	import { dashboardPage } from "$lib/wharfkit/main";
 	import { activeChainFeatures } from "$lib/wharfkit/store";
+	import { wharf } from "$lib/wharfkit/wharf";
 
-	$: needLogin = $activeSession === undefined;
+	$: needLogin = $wharf === undefined;
 
 	$: supportRex = $activeChainFeatures?.features.rex;
 	$: {

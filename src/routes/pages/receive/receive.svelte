@@ -1,10 +1,12 @@
 <script lang="ts">
-    import { activeSession, currentAccount } from "$lib/wharfkit/store";
+    import { currentAccount } from "$lib/wharfkit/store";
 
     import Button from "$lib/components/elements/button.svelte";
     import Icon from "$lib/components/elements/icon.svelte";
     import Text from "$lib/components/elements/text.svelte";
     import Clipboard from "$lib/components/elements/clipboard.svelte";
+
+    import { wharf } from "$lib/wharfkit/wharf";
 </script>
 
 {#if $currentAccount}
@@ -17,8 +19,8 @@
             </Button>
         </Clipboard>
         <p>
-            To receive tokens on {$activeSession?.chain.name}, send them
-            directly to your account name as shown above.
+            To receive tokens on {$wharf?.chain.name}, send them directly to
+            your account name as shown above.
         </p>
     </div>
 {/if}

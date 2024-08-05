@@ -2,9 +2,10 @@ import { get } from "svelte/store";
 
 import type { TransactArgs, TransactOptions, TransactResult } from "@wharfkit/session";
 
-import { activeSession, currentAccount } from "./store";
-import { Contract, type ActionsArgs } from "@wharfkit/contract";
+import { currentAccount } from "./store";
 import { wharf } from "./wharf";
+
+import { Contract, type ActionsArgs } from "@wharfkit/contract";
 import type { REXDeposit, REXBuy, REXWithdraw } from "./contracts/system"
 import type { Transfer } from "./contracts/token"
 
@@ -64,9 +65,9 @@ export async function send(data: Transfer) {
 }
 
 async function transact(args: TransactArgs, options?: TransactOptions) {
-    if (!get(activeSession))
+    if (!get(wharf))
         throw new Error("No active session")
-    const result: TransactResult = await get(activeSession)!.transact(args, options)
+    const result: TransactResult = await get(wharf)!.transact(args, options)
     console.log("transact_result = ", result)
     return result;
 }

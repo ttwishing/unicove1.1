@@ -2,9 +2,10 @@
     import { login, logout } from "$lib/wharfkit/auth";
 
     import type { SerializedSession } from "@wharfkit/session";
-    import { activeSession } from "$lib/wharfkit/store";
     import { availableSessionGroup } from "$lib/wharfkit/store";
     import { sessionEquals } from "$lib/wharfkit/auth";
+
+    import { wharf } from "$lib/wharfkit/wharf";
 
     import Button from "$lib/components/elements/button.svelte";
     import ButtonLogin from "$lib/components/elements/button/login.svelte";
@@ -13,7 +14,7 @@
     import Text from "$lib/components/elements/text.svelte";
 
     $: isActive = (session: SerializedSession) =>
-        sessionEquals(session, $activeSession);
+        sessionEquals(session, $wharf?.session);
 
     export let onSelect: (session: any) => void;
 
@@ -35,7 +36,7 @@
     }
 </script>
 
-{#if $activeSession}
+{#if $wharf}
     <div class="list">
         <div class="add-account">
             <Button fluid style="primary" on:action={handleAdd}>

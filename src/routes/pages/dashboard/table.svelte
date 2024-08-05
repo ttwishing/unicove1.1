@@ -5,9 +5,9 @@
     import TokenHeaderRow from "./headerrow.svelte";
     import TokenRow from "./row.svelte";
 
-    import { activeSession } from "$lib/wharfkit/store";
     import type { Balance } from "$lib/wharfkit/stores/balance-provider";
     import { systemToken } from "$lib/wharfkit/stores/tokens";
+    import { wharf } from "$lib/wharfkit/wharf";
 
     export let systemTokenBalance: Readable<Balance | undefined>;
     export let delegatedTokens: Readable<number>;
@@ -31,9 +31,9 @@
     // );
 
     const rexBalance: Readable<Balance | undefined> = derived(
-        [activeSession, rexTokens, systemToken],
-        ([$activeSession, $rexTokens, $systemToken]) => {
-            if ($activeSession && $rexTokens && $systemToken) {
+        [wharf, rexTokens, systemToken],
+        ([$wharf, $rexTokens, $systemToken]) => {
+            if ($wharf && $rexTokens && $systemToken) {
                 return {
                     quantity: Asset.from($rexTokens, $systemToken.symbol),
                 };
@@ -42,9 +42,9 @@
     );
 
     const stakedBalance: Readable<Balance | undefined> = derived(
-        [activeSession, delegatedTokens, systemToken],
-        ([$activeSession, $delegatedTokens, $systemToken]) => {
-            if ($activeSession && $delegatedTokens && $systemToken) {
+        [wharf, delegatedTokens, systemToken],
+        ([$wharf, $delegatedTokens, $systemToken]) => {
+            if ($wharf && $delegatedTokens && $systemToken) {
                 return {
                     quantity: Asset.from($delegatedTokens, $systemToken.symbol),
                 };

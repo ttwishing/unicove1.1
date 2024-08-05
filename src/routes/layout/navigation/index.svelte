@@ -10,7 +10,8 @@
     import NavigationContent from "./content.svelte";
     import type { NavigationItem } from "$lib/app/ui-types";
 
-    import { activeChainFeatures, activeSession } from "$lib/wharfkit/store";
+    import { activeChainFeatures } from "$lib/wharfkit/store";
+    import { wharf } from "$lib/wharfkit/wharf";
 
     export let open = false;
     export const handleNaviClick = null;
