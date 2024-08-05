@@ -13,6 +13,7 @@
     import { Int128 } from "@wharfkit/antelope";
     import {
         coreTokenBalance,
+        balances,
         delegations,
         stateREX,
     } from "$lib/wharfkit/stores/balance-provider";
@@ -75,7 +76,7 @@
     /**
      * balance value
      */
-    const balanceTokens: Readable<number> = derived(
+    const coreTokens: Readable<number> = derived(
         [coreTokenBalance],
         ([$coreTokenBalance]) => {
             let balance = 0;
@@ -87,16 +88,39 @@
     );
 
     /**
+     * balance value
+     */
+    const balancesTokens: Readable<number> = derived(
+        [balances],
+        ([$balances]) => {
+            let balance = 0;
+            if ($balances) {
+                $balances
+                    // todo, check tokenKey?
+                    // .filter(true)
+                    .map((record) => {
+                        balance += record.quantity.value;
+                    });
+            }
+            return balance;
+        },
+    );
+
+    /**
      * cal by balanceValue, rexValue, stakedValue
      */
     const totalSystemTokens: Readable<Asset | undefined> = derived(
-        [balanceTokens, delegatedTokens, rexTokens],
-        ([$balanceTokens, $delegated, $rex]) => {
+        [coreTokens, balancesTokens, delegatedTokens, rexTokens],
+        ([$coreTokens, $balancesTokens, $delegated, $rex]) => {
             if ($currentAccount) {
                 let amount = 0;
-                //balance
-                if ($balanceTokens) {
-                    amount += $balanceTokens;
+                //core token
+                if ($coreTokens) {
+                    amount += $coreTokens;
+                }
+                //balances
+                if ($balancesTokens) {
+                    amount += $balancesTokens;
                 }
                 // staked
                 if ($delegated) {

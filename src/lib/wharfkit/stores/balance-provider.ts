@@ -8,10 +8,10 @@
  * 
  */
 
-import type { Readable } from "svelte/store";
+import type { Readable, Writable } from "svelte/store";
 import { derived } from "svelte/store";
 import { get } from "svelte/store";
-import { readable } from "svelte/store";
+import { readable, writable } from "svelte/store";
 
 import { Name } from "@wharfkit/antelope";
 import { Asset } from "@wharfkit/antelope";
@@ -22,13 +22,13 @@ import { configs } from "./network-provider";
 
 import { DelegatedBandwidth } from "$lib/app/abi-types";
 import { REXState } from "@wharfkit/resources";
+import type { Session } from "@wharfkit/session";
 
+import { fetchLightApiBalances } from "./balance-utils";
 
 export interface Balance {
     quantity: Asset
 }
-
-export const balances: Readable<Balance[]> = readable([])
 
 export const coreTokenBalance: Readable<Balance | undefined> = derived(
     [currentAccount],
@@ -43,6 +43,58 @@ export const coreTokenBalance: Readable<Balance | undefined> = derived(
         }
     }
 )
+
+const balancesProvider: Writable<Balance[]> = writable([], (set) => {
+    // Update on a set interval
+    const interval = setInterval(() => {
+        const session = get(activeSession)
+        if (session) {
+            getBalances(set, session)
+        }
+    }, 30000)
+
+    // Subscribe to changes to the active session and update on change
+    const unsubscribe = activeSession.subscribe((session) => {
+        if (session) {
+            getBalances(set, session)
+        }
+    })
+
+    return () => {
+        unsubscribe()
+        clearInterval(interval)
+    }
+})
+
+
+export const balances: Readable<Balance[]> = derived([balancesProvider, activeSession],
+    ([$balancesProvider, $activeSession]) => {
+        if ($activeSession) {
+            return $balancesProvider;
+        }
+        return []
+    })
+
+async function getBalances(set: (v: any) => void, session: Session) {
+    const chain = session.chain
+    const features = configs.get(String(chain.id))!.features
+    console.log("features= ", features)
+    if (features.lightapi) {
+        getLightApiBalances(set, String(session.chain.id), session.actor)
+    } else if (features.bloks) {
+
+    }
+}
+
+export const getLightApiBalances = async (set: (v: any) => void, chindId: string, actor: Name) => {
+    console.log("getLightApiBalances....................")
+    fetchLightApiBalances(chindId, actor).then((result) => {
+        set(result)
+    }).catch((error) => {
+        set([])
+    })
+}
+
 
 export const delegations: Readable<DelegatedBandwidth[]> = derived(
     [activeSession, wharf],
@@ -87,7 +139,6 @@ export const getREXState = async (set: (v: any) => void, wharf: WharfService, ac
     wharf.getSystemContract().then((contract) => {
         contract.table("rexpool", "eosio", REXState).get()
             .then((result) => {
-                console.log("####Result: ", result)
                 set(result);
             }).catch((err) => {
                 console.log("####error: ", err)
