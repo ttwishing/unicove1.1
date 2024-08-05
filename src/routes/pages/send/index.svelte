@@ -8,7 +8,7 @@
 
     //use systemToken and coreBalance
     import { systemToken as token } from "$lib/wharfkit/stores/tokens";
-    import { coreTokenBalance as balance } from "$lib/wharfkit/stores/balance-provider";
+    import { systemTokenBalance as balance } from "$lib/wharfkit/stores/balance-provider";
     import { Step } from "./transfer";
 
     function resetData() {

@@ -12,7 +12,7 @@
     import { Asset } from "@wharfkit/antelope";
     import { Int128 } from "@wharfkit/antelope";
     import {
-        coreTokenBalance,
+        systemTokenBalance,
         balances,
         delegations,
         stateREX,
@@ -76,12 +76,12 @@
     /**
      * balance value
      */
-    const coreTokens: Readable<number> = derived(
-        [coreTokenBalance],
-        ([$coreTokenBalance]) => {
+    const sytemTokens: Readable<number> = derived(
+        [systemTokenBalance],
+        ([$systemTokenBalance]) => {
             let balance = 0;
-            if ($coreTokenBalance) {
-                balance = $coreTokenBalance.quantity.value;
+            if ($systemTokenBalance) {
+                balance = $systemTokenBalance.quantity.value;
             }
             return balance;
         },
@@ -110,13 +110,13 @@
      * cal by balanceValue, rexValue, stakedValue
      */
     const totalSystemTokens: Readable<Asset | undefined> = derived(
-        [coreTokens, balancesTokens, delegatedTokens, rexTokens],
-        ([$coreTokens, $balancesTokens, $delegated, $rex]) => {
+        [sytemTokens, balancesTokens, delegatedTokens, rexTokens],
+        ([$sytemTokens, $balancesTokens, $delegated, $rex]) => {
             if ($currentAccount) {
                 let amount = 0;
                 //core token
-                if ($coreTokens) {
-                    amount += $coreTokens;
+                if ($sytemTokens) {
+                    amount += $sytemTokens;
                 }
                 //balances
                 if ($balancesTokens) {
@@ -231,7 +231,7 @@
                 </Segment>
             </SegmentGroup>
         </div>
-        <TokenTable {coreTokenBalance} {rexTokens} {delegatedTokens} />
+        <TokenTable {systemTokenBalance} {rexTokens} {delegatedTokens} />
     </div>
 </Page>
 

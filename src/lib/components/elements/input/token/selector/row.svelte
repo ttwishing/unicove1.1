@@ -2,7 +2,7 @@
     import Icon from "$lib/components/elements/icon.svelte";
     import TokenImage from "$lib/components/elements/image/token.svelte";
     import type { Token } from "$lib/wharfkit/stores/tokens";
-    import { coreTokenBalance } from "$lib/wharfkit/stores/balance-provider";
+    import { systemTokenBalance } from "$lib/wharfkit/stores/balance-provider";
 
     export let token: Token;
     export let onClick: () => void;
@@ -16,7 +16,7 @@
         if (token.balance) {
             balance = token.balance;
         } else {
-            balance = $coreTokenBalance && $coreTokenBalance.quantity;
+            balance = $systemTokenBalance && $systemTokenBalance.quantity;
         }
         if (typeof balance === "string") {
             formattedTokenBalance = balance;

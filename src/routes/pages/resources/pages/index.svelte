@@ -2,9 +2,6 @@
     import type { Readable } from "svelte/store";
     import { derived } from "svelte/store";
 
-    import { ChainFeatures } from "$lib/app/config";
-    import { activeBlockchain } from "$lib/app/store";
-
     import ResourceStateCPU from "../components/state/cpu.svelte";
     import ResourceStateNET from "../components/state/net.svelte";
     import ResourceStateRAM from "../components/state/ram.svelte";
@@ -12,43 +9,43 @@
     import Button from "$lib/components/elements/button.svelte";
     import Text from "$lib/components/elements/text.svelte";
 
-    const { BuyRAM, PowerUp, REX, Staking } = ChainFeatures;
+    import { activeChainFeatures } from "$lib/wharfkit/store";
 
-    const hasBuyRAM: Readable<boolean | undefined> = derived(
-        activeBlockchain,
-        ($activeBlockchain) => {
-            return (
-                $activeBlockchain && $activeBlockchain.chainFeatures.has(BuyRAM)
-            );
+    const hasBuyRAM: Readable<boolean> = derived(
+        activeChainFeatures,
+        ($activeChainFeatures) => {
+            if ($activeChainFeatures && $activeChainFeatures.features.buyram)
+                return true;
+            return false;
+        },
+    );
+    const hasPowerUp: Readable<boolean> = derived(
+        activeChainFeatures,
+        ($activeChainFeatures) => {
+            console.log("activeChainFeatures = ", $activeChainFeatures);
+            if ($activeChainFeatures && $activeChainFeatures.features.powerup) {
+                return true;
+            }
+            return false;
         },
     );
 
-    const hasPowerUp: Readable<boolean | undefined> = derived(
-        activeBlockchain,
-        ($activeBlockchain) => {
-            return (
-                $activeBlockchain &&
-                $activeBlockchain.chainFeatures.has(PowerUp)
-            );
+    const hasREX: Readable<boolean> = derived(
+        activeChainFeatures,
+        ($activeChainFeatures) => {
+            if ($activeChainFeatures && $activeChainFeatures.features.rex)
+                return true;
+
+            return false;
         },
     );
 
-    const hasREX: Readable<boolean | undefined> = derived(
-        activeBlockchain,
-        ($activeBlockchain) => {
-            return (
-                $activeBlockchain && $activeBlockchain.chainFeatures.has(REX)
-            );
-        },
-    );
-
-    const hasStaking: Readable<boolean | undefined> = derived(
-        activeBlockchain,
-        ($activeBlockchain) => {
-            return (
-                $activeBlockchain &&
-                $activeBlockchain.chainFeatures.has(Staking)
-            );
+    const hasStaking: Readable<boolean> = derived(
+        activeChainFeatures,
+        ($activeChainFeatures) => {
+            if ($activeChainFeatures && $activeChainFeatures.features.staking)
+                return true;
+            return false;
         },
     );
 </script>

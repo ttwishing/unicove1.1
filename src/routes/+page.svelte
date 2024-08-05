@@ -37,6 +37,10 @@
 		<Receive />
 	{:else if "/earn" === $dashboardPage}
 		<Earn />
+	{:else if "/resources" === $dashboardPage}
+		<Resources />
+	{:else if "/resources/ram/buy" === $dashboardPage}
+		<ResourcesRAMBuy />
 	{:else}
 		<Dashboard />
 	{/if}

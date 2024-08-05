@@ -10,7 +10,7 @@
     import NavigationContent from "./content.svelte";
     import type { NavigationItem } from "$lib/app/ui-types";
 
-    import { activeChainFeatures } from "$lib/wharfkit/store";
+    import { activeChainFeatures, activeSession } from "$lib/wharfkit/store";
 
     export let open = false;
     export const handleNaviClick = null;
@@ -44,15 +44,16 @@
     ];
 
     const advancedNavigation: Readable<NavigationItem[]> = derived(
-        [activeBlockchain],
-        ([$activeBlockchain]) => {
+        [activeChainFeatures],
+        ([$activeChainFeatures]) => {
             // Items to include in the advanced section
             const items: NavigationItem[] = [];
-            if ($activeBlockchain) {
+            if ($activeChainFeatures) {
                 if (
-                    Array.from($activeBlockchain.chainFeatures).some((r) =>
-                        resourceFeatures.includes(r),
-                    )
+                    $activeChainFeatures.features.rex ||
+                    $activeChainFeatures.features.fuel ||
+                    $activeChainFeatures.features.powerup ||
+                    $activeChainFeatures.features.staking
                 ) {
                     items.push({
                         icon: "battery-charging",

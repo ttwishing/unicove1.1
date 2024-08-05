@@ -9,7 +9,7 @@
     import type { Balance } from "$lib/wharfkit/stores/balance-provider";
     import { systemToken } from "$lib/wharfkit/stores/tokens";
 
-    export let coreTokenBalance: Readable<Balance | undefined>;
+    export let systemTokenBalance: Readable<Balance | undefined>;
     export let delegatedTokens: Readable<number>;
     export let rexTokens: Readable<number>;
 
@@ -18,17 +18,17 @@
      */
     const records: Readable<Balance[]> = readable([]);
 
-    /**
-     * systemToken
-     */
-    const systemTokenBalance: Readable<Balance | undefined> = derived(
-        [activeSession, coreTokenBalance],
-        ([$activeSession, $coreTokenBalance]) => {
-            if ($activeSession && $coreTokenBalance) {
-                return $coreTokenBalance;
-            }
-        },
-    );
+    // /**
+    //  * systemToken
+    //  */
+    // const systemTokenBalance: Readable<Balance | undefined> = derived(
+    //     [activeSession, coreTokenBalance],
+    //     ([$activeSession, $coreTokenBalance]) => {
+    //         if ($activeSession && $coreTokenBalance) {
+    //             return $coreTokenBalance;
+    //         }
+    //     },
+    // );
 
     const rexBalance: Readable<Balance | undefined> = derived(
         [activeSession, rexTokens, systemToken],

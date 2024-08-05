@@ -30,7 +30,7 @@ export interface Balance {
     quantity: Asset
 }
 
-export const coreTokenBalance: Readable<Balance | undefined> = derived(
+export const systemTokenBalance: Readable<Balance | undefined> = derived(
     [currentAccount],
     ([$currentAccount], set) => {
         let coreBalance: Asset | undefined = undefined
@@ -101,6 +101,8 @@ export const delegations: Readable<DelegatedBandwidth[]> = derived(
     ([$activeSession, $wharf], set) => {
         if ($activeSession && $wharf) {
             getDeleted(set, $wharf, $activeSession.actor)
+        } else {
+            set([])
         }
     },
 );

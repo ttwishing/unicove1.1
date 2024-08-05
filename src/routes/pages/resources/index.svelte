@@ -3,7 +3,7 @@
     import { derived } from "svelte/store";
 
     import { activeBlockchain, activeSession } from "$lib/app/store";
-    import { resourceFeatures } from "$lib/app/config";
+    import { activeChainFeatures } from "$lib/wharfkit/store";
 
     import Page from "../../layout/page.svelte";
     import Button from "$lib/components/elements/button.svelte";
@@ -22,12 +22,17 @@
     // import ResourcesNETStaking from "~/pages/resources/pages/net/staking.svelte";
 
     const enabled: Readable<boolean> = derived(
-        activeBlockchain,
-        ($activeBlockchain) => {
-            if ($activeBlockchain) {
-                return Array.from($activeBlockchain.chainFeatures).some((r) =>
-                    resourceFeatures.includes(r),
-                );
+        [activeChainFeatures],
+        ([$activeChainFeatures]) => {
+            if ($activeChainFeatures) {
+                if (
+                    $activeChainFeatures.features.rex ||
+                    $activeChainFeatures.features.fuel ||
+                    $activeChainFeatures.features.powerup ||
+                    $activeChainFeatures.features.staking
+                ) {
+                    return true;
+                }
             }
             return false;
         },

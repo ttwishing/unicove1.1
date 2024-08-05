@@ -7,7 +7,7 @@ import { Session } from "@wharfkit/session";
 import type { SerializedSession } from "@wharfkit/session";
 import { Account } from "@wharfkit/account";
 import { chainIdsToIndices } from "@wharfkit/session";
-import { configs } from "./stores/network-provider";
+import { configs, type ChainConfig } from "./stores/network-provider";
 
 import { accountProvider } from "./stores/account-provider";
 
@@ -22,7 +22,7 @@ currentAccount.subscribe(value => {
     console.log("currentAccount = ", value)
 })
 
-export const activeChainFeatures = derived(activeSession, ($activeSession) => {
+export const activeChainFeatures: Readable<ChainConfig | undefined> = derived(activeSession, ($activeSession) => {
     if ($activeSession) {
         return configs.get(String($activeSession.chain.id))
     }

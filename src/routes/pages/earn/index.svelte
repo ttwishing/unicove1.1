@@ -8,7 +8,7 @@
     import { systemTokenKey, systemToken } from "$lib/wharfkit/stores/tokens";
     import {
         stateREX,
-        coreTokenBalance,
+        systemTokenBalance,
     } from "$lib/wharfkit/stores/balance-provider";
 
     import { stake, unstake } from "$lib/wharfkit/transact";
@@ -58,11 +58,10 @@
      * used to stake
      */
     const availableSystemTokens: Readable<Asset | undefined> = derived(
-        [coreTokenBalance],
-        ([$coreTokenBalance]) => {
-            let amount = 0;
-            if ($coreTokenBalance) {
-                return $coreTokenBalance.quantity;
+        [systemTokenBalance],
+        ([$systemTokenBalance]) => {
+            if ($systemTokenBalance) {
+                return $systemTokenBalance.quantity;
             }
         },
     );

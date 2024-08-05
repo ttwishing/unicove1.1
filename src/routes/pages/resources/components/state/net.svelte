@@ -2,7 +2,7 @@
     import { derived } from "svelte/store";
     import Gauge from "$lib/components/elements/gauge.svelte";
 
-    import { currentAccount } from "$lib/app/store";
+    import { currentAccount } from "$lib/wharfkit/store";
     import Wrapper from "./wrapper.svelte";
 
     export let showExtra = false;
@@ -12,8 +12,8 @@
     export const used = derived([currentAccount], ([$currentAccount]) => {
         let percentage = 100;
         if ($currentAccount) {
-            const max = Number($currentAccount?.net_limit.max);
-            const usage = Number($currentAccount?.net_limit.used);
+            const max = Number($currentAccount!.data.net_limit.max);
+            const usage = Number($currentAccount!.data.net_limit.used);
             percentage = isNaN(max) || isNaN(usage) ? 0 : (usage / max) * 100;
             if (max === 0 || percentage > 100) {
                 percentage = 100;
@@ -24,7 +24,7 @@
         }
     });
     $: usagePerc = (
-        Number($currentAccount?.net_limit.available) / 1000
+        Number($currentAccount?.data.net_limit.available) / 1000
     ).toFixed(precision);
 </script>
 
@@ -49,24 +49,24 @@
                 <span>Available:</span>
                 <span
                     >{(
-                        Number($currentAccount?.net_limit.available) / 1000
+                        Number($currentAccount?.data.net_limit.available) / 1000
                     ).toFixed(precision)} kb</span
                 >
             </li>
             <li>
                 <span>Used:</span>
                 <span>
-                    {(Number($currentAccount?.net_limit.used) / 1000).toFixed(
-                        precision,
-                    )}<span> &nbsp;kb</span>
+                    {(
+                        Number($currentAccount?.data.net_limit.used) / 1000
+                    ).toFixed(precision)}<span> &nbsp;kb</span>
                 </span>
             </li>
             <li>
                 <span>Maximum:</span>
                 <span
-                    >{(Number($currentAccount?.net_limit.max) / 1000).toFixed(
-                        precision,
-                    )} kb</span
+                    >{(
+                        Number($currentAccount?.data.net_limit.max) / 1000
+                    ).toFixed(precision)} kb</span
                 >
             </li>
         </ul>
