@@ -6,8 +6,8 @@ import type { Token } from '$lib/wharfkit/stores/tokens';
 import { currentAccount } from '$lib/wharfkit/store';
 import { get } from 'svelte/store';
 import type { ChainDefinition } from '@wharfkit/session';
-import { configs } from '$lib/wharfkit/config';
-import type { ChainConfig as ChainFeaturesConfig } from '$lib/wharfkit/config';
+import { configs } from '$lib/wharfkit/stores/network-provider';
+import type { ChainConfig as ChainFeaturesConfig } from '$lib/wharfkit/stores/network-provider';
 
 export const rexIsAvailable = (chainData: ChainConfig | undefined): boolean => {
     return !!chainData?.rexEnabled

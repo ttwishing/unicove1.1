@@ -18,7 +18,7 @@ import { Asset } from "@wharfkit/antelope";
 import { activeSession, currentAccount } from "../store";
 import { wharf } from "../wharf";
 import { WharfService } from "../wharf";
-import { configs } from "../config";
+import { configs } from "./network-provider";
 
 import { DelegatedBandwidth } from "$lib/app/abi-types";
 import { REXState } from "@wharfkit/resources";

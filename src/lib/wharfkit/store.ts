@@ -7,7 +7,7 @@ import { Session } from "@wharfkit/session";
 import type { SerializedSession } from "@wharfkit/session";
 import { Account } from "@wharfkit/account";
 import { chainIdsToIndices } from "@wharfkit/session";
-import { configs } from "./config";
+import { configs } from "./stores/network-provider";
 
 import { accountProvider } from "./stores/account-provider";
 
