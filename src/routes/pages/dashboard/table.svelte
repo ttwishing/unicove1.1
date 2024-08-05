@@ -6,7 +6,7 @@
     import TokenRow from "./row.svelte";
 
     import { activeSession } from "$lib/wharfkit/store";
-    import type { Balance } from "$lib/wharfkit/stores/balances";
+    import type { Balance } from "$lib/wharfkit/stores/balance-provider";
     import { systemToken } from "$lib/wharfkit/stores/tokens";
 
     export let coreTokenBalance: Readable<Balance | undefined>;

@@ -7,6 +7,7 @@ export interface ChainConfig {
 }
 
 export const configs: Map<string, ChainConfig> = new Map();
+
 configs.set(String(Chains.Jungle4.id), {
     features: {
         rex: true

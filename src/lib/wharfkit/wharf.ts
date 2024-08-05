@@ -32,7 +32,7 @@ const seessionArgs: SessionKitArgs = {
 }
 export const sessionKit: SessionKit = new SessionKit(seessionArgs)
 
-class WharfService {
+export class WharfService {
     public chain: ChainDefinition
     public client: APIClient
     public accountKit: AccountKit

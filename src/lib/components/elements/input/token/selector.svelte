@@ -4,8 +4,7 @@
     import { activeBlockchain } from "$lib/app/store";
     import type { Token } from "$lib/wharfkit/stores/tokens";
     import { tokenFromBalance, tokens } from "$lib/stores/tokens";
-    // import { balances } from "$lib/wharfkit/stores/balances";
-    import type { Balance } from "$lib/wharfkit/stores/balances";
+    import type { Balance } from "$lib/wharfkit/stores/balance-provider";
 
     import Form from "$lib/components/elements/form.svelte";
     import Input from "$lib/components/elements/input.svelte";

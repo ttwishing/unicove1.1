@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Asset } from "@wharfkit/antelope";
 
-    import type { Balance } from "$lib/wharfkit/stores/balances";
+    import type { Balance } from "$lib/wharfkit/stores/balance-provider";
     import type { Token } from "$lib/wharfkit/stores/tokens";
     import type { Readable } from "svelte/store";
 

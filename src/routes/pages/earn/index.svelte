@@ -6,7 +6,10 @@
     import { currentAccount, activeSession } from "$lib/wharfkit/store";
     import type { Token } from "$lib/wharfkit/stores/tokens";
     import { systemTokenKey, systemToken } from "$lib/wharfkit/stores/tokens";
-    import { balances, coreTokenBalance } from "$lib/wharfkit/stores/balances";
+    import {
+        stateREX,
+        coreTokenBalance,
+    } from "$lib/wharfkit/stores/balance-provider";
 
     import { stake, unstake } from "$lib/wharfkit/transact";
 
@@ -21,12 +24,9 @@
 
     import type { FormTransaction } from "$lib/app/ui-types";
 
-    import { rexIsAvailable } from "$lib/utils/rex";
-
     import Page from "../../layout/page.svelte";
     import TransactionForm from "$lib/components/elements/form/transaction.svelte";
 
-    import { stateREX } from "$lib/wharfkit/stores/resources";
     import { Step } from "./types";
     import type { REXInfo } from "./types";
     import REXError from "./step/error.svelte";

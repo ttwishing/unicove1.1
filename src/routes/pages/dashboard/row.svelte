@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Readable } from "svelte/store";
     import { derived } from "svelte/store";
-    import type { Balance } from "$lib/wharfkit/stores/balances";
+    import type { Balance } from "$lib/wharfkit/stores/balance-provider";
     import type { Token } from "$lib/wharfkit/stores/tokens";
     // import { tokenFromBalance, tokens } from "$lib/wharfkit/stores/tokens";
 

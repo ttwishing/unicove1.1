@@ -2,7 +2,7 @@
     import Icon from "$lib/components/elements/icon.svelte";
     import TokenImage from "$lib/components/elements/image/token.svelte";
     import type { Token } from "$lib/wharfkit/stores/tokens";
-    import { coreTokenBalance } from "$lib/wharfkit/stores/balances";
+    import { coreTokenBalance } from "$lib/wharfkit/stores/balance-provider";
 
     export let token: Token;
     export let onClick: () => void;

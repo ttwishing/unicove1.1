@@ -8,13 +8,14 @@
     import { systemTokenKey } from "$lib/wharfkit/stores/tokens";
     import { systemToken } from "$lib/wharfkit/stores/tokens";
 
-    import { coreTokenBalance } from "$lib/wharfkit/stores/balances";
     import { derived, type Readable } from "svelte/store";
     import { Asset } from "@wharfkit/antelope";
     import { Int128 } from "@wharfkit/antelope";
-
-    import { delegations } from "$lib/wharfkit/stores/delegations";
-    import { stateREX } from "$lib/wharfkit/stores/resources";
+    import {
+        coreTokenBalance,
+        delegations,
+        stateREX,
+    } from "$lib/wharfkit/stores/balance-provider";
     import { currentAccount } from "$lib/wharfkit/store";
 
     //delegated tokens
@@ -22,12 +23,8 @@
         [currentAccount, delegations],
         ([$currentAccount, $delegations]) => {
             let delegated = 0;
-            if (
-                $currentAccount &&
-                $delegations &&
-                $delegations.rows.length > 0
-            ) {
-                $delegations.rows
+            if ($currentAccount && $delegations && $delegations.length > 0) {
+                $delegations
                     .filter((record) =>
                         record.from.equals($currentAccount.accountName),
                     )
