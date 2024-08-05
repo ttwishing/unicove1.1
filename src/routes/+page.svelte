@@ -10,10 +10,14 @@
 	import { activeSession } from "$lib/wharfkit/store";
 	import { appReady } from "$lib/wharfkit/main";
 	import { dashboardPage } from "$lib/wharfkit/main";
+	import { activeChainFeatures } from "$lib/wharfkit/store";
 
 	$: needLogin = $activeSession === undefined;
+
+	$: supportRex = $activeChainFeatures?.features.rex;
 	$: {
 		console.log("appReady = ", $appReady);
+		console.log("supportRex = ", supportRex);
 	}
 </script>
 

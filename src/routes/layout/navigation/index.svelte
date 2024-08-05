@@ -4,11 +4,13 @@
 
     import { resourceFeatures } from "$lib/app/config";
     import { activeBlockchain } from "$lib/app/store";
-    import { rexIsAvailable } from "$lib/utils/rex";
+    import { rexIsAvailable, isRexAvailable } from "$lib/utils/rex";
 
     import MediaQuery from "$lib/components/utils/media-query.svelte";
     import NavigationContent from "./content.svelte";
     import type { NavigationItem } from "$lib/app/ui-types";
+
+    import { activeChainFeatures } from "$lib/wharfkit/store";
 
     export let open = false;
     export const handleNaviClick = null;
@@ -30,7 +32,7 @@
             name: "Receive",
             path: "/receive",
         },
-        ...(rexIsAvailable($activeBlockchain)
+        ...(isRexAvailable($activeChainFeatures)
             ? [
                   {
                       icon: "dollar-sign",

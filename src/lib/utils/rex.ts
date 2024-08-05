@@ -1,13 +1,20 @@
-import type { ChainConfig } from '$lib/app/config'
+import type { ChainConfig, ChainFeatures } from '$lib/app/config'
 import { Asset, Int64, Int128 } from '@wharfkit/antelope';
 import type { Readable } from 'svelte/motion';
 import { REXState } from '@wharfkit/resources';
 import type { Token } from '$lib/wharfkit/stores/tokens';
 import { currentAccount } from '$lib/wharfkit/store';
 import { get } from 'svelte/store';
+import type { ChainDefinition } from '@wharfkit/session';
+import { configs } from '$lib/wharfkit/config';
+import type { ChainConfig as ChainFeaturesConfig } from '$lib/wharfkit/config';
 
 export const rexIsAvailable = (chainData: ChainConfig | undefined): boolean => {
     return !!chainData?.rexEnabled
+}
+
+export const isRexAvailable = (chain: ChainFeaturesConfig | undefined): boolean => {
+    return !!chain?.features.rex
 }
 
 

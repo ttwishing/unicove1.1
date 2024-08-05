@@ -7,6 +7,7 @@ import { Session } from "@wharfkit/session";
 import type { SerializedSession } from "@wharfkit/session";
 import { Account } from "@wharfkit/account";
 import { chainIdsToIndices } from "@wharfkit/session";
+import { configs } from "./config";
 
 import { accountProvider } from "./stores/account-provider";
 
@@ -19,6 +20,12 @@ export const currentAccount: Readable<Account | undefined> = derived(
 
 currentAccount.subscribe(value => {
     console.log("currentAccount = ", value)
+})
+
+export const activeChainFeatures = derived(activeSession, ($activeSession) => {
+    if ($activeSession) {
+        return configs.get(String($activeSession.chain.id))
+    }
 })
 
 export const availableSessionGroup: Readable<SessionGroup[]> = derived(
