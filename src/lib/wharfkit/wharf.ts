@@ -36,6 +36,7 @@ export class WharfService {
     public actor: Name
     public chain: ChainDefinition
     public chainId: string
+    public chainName: string
     public coreTokenSymbol: Asset.SymbolType
     public client: APIClient
     public accountKit: AccountKit
@@ -49,6 +50,7 @@ export class WharfService {
         this.actor = session.actor
         this.chain = session.chain
         this.chainId = String(this.chain.id)
+        this.chainName = configs.get(this.chainId)!.name
         this.coreTokenSymbol = configs.get(this.chainId)?.symbol || '4,EOS'
         this.client = new APIClient({ url: this.chain.url })
         this.accountKit = new AccountKit(this.chain, { client: this.client })

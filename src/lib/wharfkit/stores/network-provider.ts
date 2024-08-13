@@ -7,6 +7,7 @@ export interface ChainConfig {
     features: Record<FeatureType, boolean>;
     symbol: Asset.SymbolType; //todo: kurt  read from acount or buildIn
     testnet: boolean;
+    name: string;
 }
 
 export enum BalanceType {
@@ -29,6 +30,7 @@ configs.set(String(Chains.EOS.id), {
     },
     symbol: '4,EOS',
     testnet: false,
+    name: "eos",
 })
 
 configs.set(String(Chains.Jungle4.id), {
@@ -44,6 +46,7 @@ configs.set(String(Chains.Jungle4.id), {
     },
     symbol: '4,EOS',
     testnet: true,
+    name: 'jungle4',
 })
 configs.set(String(Chains.WAXTestnet.id), {
     features: {
@@ -58,5 +61,6 @@ configs.set(String(Chains.WAXTestnet.id), {
     },
     symbol: '8,WAX',
     testnet: true,
+    name: "wax",
 })
 

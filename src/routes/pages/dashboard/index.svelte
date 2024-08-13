@@ -146,9 +146,6 @@
             return value;
         },
     );
-    delegatedUSD.subscribe((value) => {
-        console.log("delegatedUSD>>>>>>>>>>>>>>>>>>", value);
-    });
 
     const rexUSD: Readable<number> = derived(
         [rexTokens, priceTicker],
@@ -160,10 +157,6 @@
             return value;
         },
     );
-
-    delegatedUSD.subscribe((value) => {
-        console.log("rexUSD>>>>>>>>>>>>>>>>>>", value);
-    });
 
     const balanceUSD: Readable<number> = derived(
         [balances, currentAccount],

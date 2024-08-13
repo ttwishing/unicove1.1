@@ -25,10 +25,9 @@ import { REXState } from "@wharfkit/resources";
 import type { Session } from "@wharfkit/session";
 import { Contract } from "@wharfkit/contract";
 
-import { fetchLightApiBalances } from "./balance-utils";
-
 export interface Balance {
-    quantity: Asset
+    quantity: Asset,
+    contractAccount: Name,
 }
 
 export const systemTokenBalance: Readable<Balance | undefined> = derived(
@@ -40,7 +39,7 @@ export const systemTokenBalance: Readable<Balance | undefined> = derived(
             if (!coreBalance) {
                 coreBalance = Asset.from(0, $currentAccount.systemToken)
             }
-            set({ quantity: coreBalance })
+            set({ quantity: coreBalance, contractAccount: $currentAccount.systemContract.account })
         }
     }
 )
@@ -76,23 +75,22 @@ export const balances: Readable<Balance[]> = derived([balancesProvider],
     ([$balancesProvider]) => $balancesProvider
 )
 
-async function getBalances(set: (v: any) => void, wharf: WharfService) {
-    const features = configs.get(wharf.chainId)!.features
-    if (features.lightapi) {
-        getLightApiBalances(set, wharf.chainId, wharf.actor)
-    } else if (features.bloks) {
-
-    }
-}
-
-export const getLightApiBalances = async (set: (v: any) => void, chindId: string, actor: Name) => {
-    fetchLightApiBalances(chindId, actor).then((result) => {
+export const getLightApiBalances = async (set: (v: any) => void, chindName: string, actor: Name) => {
+    fetchLightApiBalances(chindName, actor).then((result) => {
         set(result)
     }).catch((error) => {
         set([])
     })
 }
 
+async function getBalances(set: (v: any) => void, wharf: WharfService) {
+    const features = configs.get(wharf.chainId)!.features
+    if (features.lightapi) {
+        getLightApiBalances(set, wharf.chainName, wharf.actor)
+    } else if (features.bloks) {
+
+    }
+}
 
 export const delegations: Readable<DelegatedBandwidth[]> = derived(
     [wharf],
@@ -197,16 +195,70 @@ async function getDataPoint(contract: Contract, wharf: WharfService, pairName?: 
     if (!pair)
         throw new Error(`No pair for ${pairName} on ${wharf.chainId}`)
 
-    const resPairName = pair.name;
-    console.log("resPairName = ", resPairName)
+    const resPairName = pair.name;  //eosusd
+    console.log("resPairName = ", String(resPairName))
     const datapoint: DelphiOracleDatapoint = await contract.table("datapoints", resPairName, DelphiOracleDatapoint).get();
     if (!datapoint) {
         throw new Error(`No datapoint for ${pairName} on ${wharf.chainId}`)
     }
-    console.log("median = ", datapoint.median.toNumber())
-    console.log("quoted_precision = ", pair.quoted_precision.toNumber())
+
     const result = datapoint.median.toNumber() / Math.pow(10, pair.quoted_precision.toNumber())
     console.log("result = ", result)
     return result;
 }
 
+
+async function fetchLightApiBalances(chainName: string, account: Name): Promise<Balance[]> {
+    const apiUrl = `https://balances.unicove.com/api/balances/${chainName}/${account}`
+    let response: Response | undefined = undefined
+    try {
+        response = await fetch(apiUrl);
+    } catch (error) {
+    }
+    if (!response)
+        return []
+
+    let jsonBody = undefined
+    try {
+        jsonBody = await response.json()
+    } catch (error) {
+    }
+
+    if (!jsonBody) {
+        return []
+    }
+    const balances: RawTokenBalance[] = jsonBody.balances
+    balances.forEach((value, index) => {
+        console.log(`${index} = `, value)
+    })
+    return balances
+        .filter((balance) => {
+            return balance.amount && Number(balance.amount) !== 0
+        })
+        .map((balance) => {
+            const symbol: Asset.Symbol = Asset.Symbol.from(
+                `${balance.decimals},${balance.currency}`
+            )
+            const amount = balance.amount ? Number(balance.amount) : 0
+            const asset = Asset.from(amount, symbol)
+            const record: Balance = {
+                contractAccount: Name.from(balance.contract),
+                quantity: asset,
+            }
+            return record
+        })
+        .filter((balance) => !!balance)
+}
+
+async function fetchBloksBalances(chaindId: string, account: Name): Promise<Balance[]> {
+    return []
+}
+
+
+
+interface RawTokenBalance {
+    currency: string
+    amount: string
+    decimals: number
+    contract: string
+}
