@@ -2,7 +2,9 @@ import { type LoginOptions, type LoginResult, type Session } from "@wharfkit/ses
 import type { SerializedSession, RestoreArgs } from "@wharfkit/session";
 import { sessionKit, updateSession } from "./wharf";
 
-import { availableSessions } from "./store";
+import { availableSessions, currentAccount } from "./store";
+
+import { reset } from "./stores/account-provider";
 
 export function sessionEquals(session: SerializedSession, activeSession?: Session): boolean {
     if (!activeSession)
@@ -53,6 +55,7 @@ export async function activate(target: SerializedSession) {
     if (!session) {
         throw new Error('No such session')
     }
+    // reset()
     updateSession(session)
 }
 

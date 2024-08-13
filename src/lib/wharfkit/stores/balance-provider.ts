@@ -122,10 +122,9 @@ async function getBalances(set: (v: any) => void, wharf: WharfService) {
 export const delegations: Readable<DelegatedBandwidth[]> = derived(
     [wharf],
     ([$wharf], set) => {
+        set([])
         if ($wharf) {
             getDeleted(set, $wharf, $wharf.actor)
-        } else {
-            set([])
         }
     },
 );
@@ -147,6 +146,7 @@ export const getDeleted = async (set: (v: any) => void, wharf: WharfService, act
 export const stateREX: Readable<REXState | undefined> = derived(
     [wharf],
     ([$wharf], set) => {
+        set(undefined)
         if ($wharf && configs.get($wharf.chainId)!.features.rex) {
             getREXState(set, $wharf, $wharf.actor)
             const interval = setInterval(() =>
@@ -163,6 +163,7 @@ export const getREXState = async (set: (v: any) => void, wharf: WharfService, ac
     wharf.getSystemContract().then((contract) => {
         contract.table("rexpool", "eosio", REXState).get()
             .then((result) => {
+                console.log("getREXState.................", String(actor))
                 set(result);
             }).catch((err) => {
                 console.warn("Error retrieving REXState", err);

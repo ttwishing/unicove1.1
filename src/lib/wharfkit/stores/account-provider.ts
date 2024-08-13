@@ -33,6 +33,10 @@ const initialAccountResponse: AccountResponse = {
     stale: true,
 }
 
+export function reset() {
+    accountProvider.set({ stale: true })
+}
+
 export const accountProvider: Writable<AccountResponse> = writable(initialAccountResponse, () => {
     // Update on a set interval
     const interval = setInterval(() => {
