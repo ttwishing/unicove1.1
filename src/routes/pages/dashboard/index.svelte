@@ -49,7 +49,6 @@
                 $stateREX &&
                 $stateREX.value
             ) {
-                console.log("########enter");
                 if ($stateREX.value === 0.0001) {
                     const pool = $stateREX;
                     if (!$systemToken || !pool) {
