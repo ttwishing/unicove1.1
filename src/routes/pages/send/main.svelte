@@ -10,7 +10,7 @@
     import TransferSending from "./step/sending.svelte";
 
     import type { Balance } from "$lib/wharfkit/stores/balance-provider";
-    import type { Token } from "$lib/wharfkit/stores/tokens";
+    import type { Token } from "$lib/wharfkit/tokens";
 
     import Button from "$lib/components/elements/button.svelte";
     import Icon from "$lib/components/elements/icon.svelte";
@@ -23,7 +23,7 @@
 
     import { send } from "$lib/wharfkit/transact";
     import type { Transfer } from "$lib/wharfkit/contracts/token";
-    import { systemToken } from "$lib/wharfkit/stores/tokens";
+    import { systemToken } from "$lib/wharfkit/tokens";
     import { wharf } from "$lib/wharfkit/wharf";
 
     export let balance: Readable<Balance | undefined>;

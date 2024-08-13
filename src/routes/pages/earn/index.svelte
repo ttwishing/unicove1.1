@@ -4,8 +4,8 @@
     import { type AnyAction, Asset, Int64, Int128 } from "@wharfkit/antelope";
 
     import { currentAccount } from "$lib/wharfkit/store";
-    import type { Token } from "$lib/wharfkit/stores/tokens";
-    import { systemTokenKey, systemToken } from "$lib/wharfkit/stores/tokens";
+    import type { Token } from "$lib/wharfkit/tokens";
+    import { systemTokenKey, systemToken } from "$lib/wharfkit/tokens";
     import {
         stateREX,
         systemTokenBalance,

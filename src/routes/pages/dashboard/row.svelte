@@ -2,7 +2,7 @@
     import type { Readable } from "svelte/store";
     import { derived } from "svelte/store";
     import type { Balance } from "$lib/wharfkit/stores/balance-provider";
-    import type { Token } from "$lib/wharfkit/stores/tokens";
+    import type { Token } from "$lib/wharfkit/tokens";
     // import { tokenFromBalance, tokens } from "$lib/wharfkit/stores/tokens";
 
     import Button from "$lib/components/elements/button.svelte";
@@ -11,7 +11,7 @@
     import TokenImage from "$lib/components/elements/image/token.svelte";
 
     import Number from "./number.svelte";
-    import { systemToken } from "$lib/wharfkit/stores/tokens";
+    import { systemToken } from "$lib/wharfkit/tokens";
 
     export let balance: Balance;
     export let name: string = "";

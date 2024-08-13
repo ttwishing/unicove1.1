@@ -2,7 +2,7 @@ import type { ChainConfig, ChainFeatures } from '$lib/app/config'
 import { Asset, Int64, Int128 } from '@wharfkit/antelope';
 import type { Readable } from 'svelte/motion';
 import { REXState } from '@wharfkit/resources';
-import type { Token } from '$lib/wharfkit/stores/tokens';
+import type { Token } from '$lib/wharfkit/tokens';
 import { currentAccount } from '$lib/wharfkit/store';
 import { get } from 'svelte/store';
 import type { ChainDefinition } from '@wharfkit/session';

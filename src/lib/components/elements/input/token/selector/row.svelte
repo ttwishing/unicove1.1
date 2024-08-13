@@ -1,7 +1,7 @@
 <script lang="ts">
     import Icon from "$lib/components/elements/icon.svelte";
     import TokenImage from "$lib/components/elements/image/token.svelte";
-    import type { Token } from "$lib/wharfkit/stores/tokens";
+    import type { Token } from "$lib/wharfkit/tokens";
     import { systemTokenBalance } from "$lib/wharfkit/stores/balance-provider";
 
     export let token: Token;

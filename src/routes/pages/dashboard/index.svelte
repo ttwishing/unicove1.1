@@ -5,8 +5,8 @@
     import Segment from "$lib/components/elements/segment.svelte";
     import TokenTable from "./table.svelte";
 
-    import { systemTokenKey } from "$lib/wharfkit/stores/tokens";
-    import { systemToken } from "$lib/wharfkit/stores/tokens";
+    import { systemTokenKey } from "$lib/wharfkit/tokens";
+    import { systemToken } from "$lib/wharfkit/tokens";
 
     import { derived, type Readable } from "svelte/store";
     import { Asset } from "@wharfkit/antelope";

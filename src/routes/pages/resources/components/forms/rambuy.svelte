@@ -10,7 +10,7 @@
         activeChainFeatures,
     } from "$lib/wharfkit/store";
 
-    import { systemToken } from "$lib/wharfkit/stores/tokens";
+    import { systemToken } from "$lib/wharfkit/tokens";
     import { systemTokenBalance } from "$lib/wharfkit/stores/balance-provider";
     import { stateRAM } from "~/pages/resources/resources";
 

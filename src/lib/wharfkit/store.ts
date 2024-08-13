@@ -64,3 +64,4 @@ interface SessionGroup {
     name: string;
     sessions: SerializedSession[];
 }
+

@@ -5,7 +5,7 @@
 
     import { activeBlockchain, activeSession } from "$lib/app/store";
     import type { Balance } from "$lib/wharfkit/stores/balance-provider";
-    import type { Token } from "$lib/wharfkit/stores/tokens";
+    import type { Token } from "$lib/wharfkit/tokens";
 
     import Button from "$lib/components/elements/button.svelte";
     import InputLabel from "$lib/components/elements/input/label.svelte";

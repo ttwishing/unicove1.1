@@ -2,7 +2,7 @@
     import { Asset } from "@wharfkit/antelope";
 
     import type { Balance } from "$lib/wharfkit/stores/balance-provider";
-    import type { Token } from "$lib/wharfkit/stores/tokens";
+    import type { Token } from "$lib/wharfkit/tokens";
     import type { Readable } from "svelte/store";
 
     import InputAsset from "$lib/components/elements/input/asset.svelte";

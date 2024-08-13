@@ -6,7 +6,7 @@
     import TokenRow from "./row.svelte";
 
     import type { Balance } from "$lib/wharfkit/stores/balance-provider";
-    import { systemToken } from "$lib/wharfkit/stores/tokens";
+    import { systemToken } from "$lib/wharfkit/tokens";
     import { wharf } from "$lib/wharfkit/wharf";
 
     export let systemTokenBalance: Readable<Balance | undefined>;

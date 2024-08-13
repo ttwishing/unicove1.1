@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Readable } from "svelte/store";
     import type { Balance } from "$lib/wharfkit/stores/balance-provider";
-    import type { Token } from "$lib/wharfkit/stores/tokens";
+    import type { Token } from "$lib/wharfkit/tokens";
 
     export let token: Token;
     export let balance: Readable<Balance | undefined>;

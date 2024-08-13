@@ -7,7 +7,7 @@
     import { wharf } from "$lib/wharfkit/wharf";
 
     //use systemToken and coreBalance
-    import { systemToken as token } from "$lib/wharfkit/stores/tokens";
+    import { systemToken as token } from "$lib/wharfkit/tokens";
     import { systemTokenBalance as balance } from "$lib/wharfkit/stores/balance-provider";
     import { Step } from "./transfer";
 

@@ -2,7 +2,7 @@
     import { writable } from "svelte/store";
 
     import { activeBlockchain } from "$lib/app/store";
-    import type { Token } from "$lib/wharfkit/stores/tokens";
+    import type { Token } from "$lib/wharfkit/tokens";
     import { tokenFromBalance, tokens } from "$lib/stores/tokens";
     import type { Balance } from "$lib/wharfkit/stores/balance-provider";
 
