@@ -6,7 +6,7 @@
  * 
  */
 import SessionKit from "@wharfkit/session";
-import { Session, type ChainIndices, type SessionKitArgs } from "@wharfkit/session";
+import { Asset, Session, type ChainIndices, type SessionKitArgs } from "@wharfkit/session";
 import { Chains } from "@wharfkit/session";
 import WebRenderer from "@wharfkit/web-renderer";
 import type { WalletPlugin } from "@wharfkit/session";
@@ -19,12 +19,13 @@ import { Contract } from "@wharfkit/contract";
 import { derived, writable } from "svelte/store";
 import type { Readable, Writable } from "svelte/store";
 import type { TransactArgs, TransactOptions } from "@wharfkit/session";
+import { configs } from "./stores/network-provider";
 
 const walletPlugins: WalletPlugin[] = [new WalletPluginAnchor()];
 
 const seessionArgs: SessionKitArgs = {
     appName: "unicove1.1",
-    chains: [Chains.Jungle4, Chains.WAXTestnet],
+    chains: [Chains.EOS, Chains.Jungle4, Chains.WAXTestnet],
     ui: new WebRenderer(),
     walletPlugins: walletPlugins
 }
@@ -35,17 +36,20 @@ export class WharfService {
     public actor: Name
     public chain: ChainDefinition
     public chainId: string
+    public coreTokenSymbol: Asset.SymbolType
     public client: APIClient
     public accountKit: AccountKit
     public contractKit: ContractKit
     private systemContract: Contract | undefined;
     private tokenContract: Contract | undefined;
+    private delphiOracleContract: Contract | undefined;
 
     constructor(session: Session) {
         this.session = session;
         this.actor = session.actor
         this.chain = session.chain
         this.chainId = String(this.chain.id)
+        this.coreTokenSymbol = configs.get(this.chainId)?.symbol || '4,EOS'
         this.client = new APIClient({ url: this.chain.url })
         this.accountKit = new AccountKit(this.chain, { client: this.client })
         this.contractKit = new ContractKit({ client: this.client })
@@ -63,6 +67,13 @@ export class WharfService {
             this.tokenContract = await this.contractKit.load(Name.from("eosio.token"))
         }
         return this.tokenContract;
+    }
+
+    public async getDelphiOracleContract(): Promise<Contract> {
+        if (!this.delphiOracleContract) {
+            this.delphiOracleContract = await this.contractKit.load(Name.from("delphioracle"))
+        }
+        return this.delphiOracleContract;
     }
 
     public async transact(args: TransactArgs, options?: TransactOptions) {

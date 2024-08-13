@@ -16,6 +16,7 @@
         balances,
         delegations,
         stateREX,
+        priceTicker,
     } from "$lib/wharfkit/stores/balance-provider";
     import { currentAccount } from "$lib/wharfkit/store";
 
@@ -135,64 +136,71 @@
         },
     );
 
-    // const delegatedUSD: Readable<number> = derived(
-    //     [delegatedTokens, currentAccount, activePriceTicker],
-    //     ([$delegated, $currentAccount, $price]) => {
-    //         let value = 0;
-    //         if ($currentAccount && $price !== undefined) {
-    //             value += $delegated * $price;
-    //         }
-    //         return value;
-    //     },
-    // );
+    const delegatedUSD: Readable<number> = derived(
+        [delegatedTokens, priceTicker],
+        ([$delegated, $price]) => {
+            let value = 0;
+            if ($delegated && $price) {
+                value += $delegated * $price;
+            }
+            return value;
+        },
+    );
+    delegatedUSD.subscribe((value) => {
+        console.log("delegatedUSD>>>>>>>>>>>>>>>>>>", value);
+    });
 
-    // const rexUSD: Readable<number> = derived(
-    //     [rexTokens, currentAccount, activePriceTicker],
-    //     ([$rex, $currentAccount, $price]) => {
-    //         let value = 0;
-    //         if ($currentAccount && $price !== undefined) {
-    //             value += $rex * $price;
-    //         }
-    //         return value;
-    //     },
-    // );
+    const rexUSD: Readable<number> = derived(
+        [rexTokens, priceTicker],
+        ([$rex, $price]) => {
+            let value = 0;
+            if ($rex && $price) {
+                value += $rex * $price;
+            }
+            return value;
+        },
+    );
 
-    // const balanceUSD: Readable<number> = derived(
-    //     [balances, currentAccount],
-    //     ([$balances, $currentAccount]) => {
-    //         let value = 0;
-    //         if ($currentAccount) {
-    //             $balances
-    //                 .filter((record) =>
-    //                     record.account.equals($currentAccount.account_name),
-    //                 )
-    //                 .map((record) => {
-    //                     const token = getToken(record.tokenKey);
-    //                     if (token && token.price) {
-    //                         value += record.quantity.value * token.price;
-    //                     }
-    //                 });
-    //         }
-    //         return value;
-    //     },
-    // );
+    delegatedUSD.subscribe((value) => {
+        console.log("rexUSD>>>>>>>>>>>>>>>>>>", value);
+    });
 
-    // const totalUsdValue: Readable<number> = derived(
-    //     [delegatedUSD, rexUSD, balanceUSD],
-    //     ([$delegated, $rex, $balances]) => {
-    //         let value = 0;
-    //         if ($delegated) {
-    //             value += $delegated;
-    //         }
-    //         if ($rex) {
-    //             value += $rex;
-    //         }
-    //         if ($balances) {
-    //             value += $balances;
-    //         }
-    //         return value;
-    //     },
-    // );
+    const balanceUSD: Readable<number> = derived(
+        [balances, currentAccount],
+        ([$balances, $currentAccount]) => {
+            let value = 0;
+            // if ($currentAccount) {
+            //     $balances
+            //         .filter((record) =>
+            //             record.account.equals($currentAccount.account_name),
+            //         )
+            //         .map((record) => {
+            //             const token = getToken(record.tokenKey);
+            //             if (token && token.price) {
+            //                 value += record.quantity.value * token.price;
+            //             }
+            //         });
+            // }
+            return value;
+        },
+    );
+
+    const totalUsdValue: Readable<number> = derived(
+        [delegatedUSD, rexUSD, balanceUSD],
+        ([$delegated, $rex, $balances]) => {
+            let value = 0;
+            if ($delegated) {
+                value += $delegated;
+            }
+            if ($rex) {
+                value += $rex;
+            }
+            if ($balances) {
+                value += $balances;
+            }
+            return value;
+        },
+    );
 </script>
 
 <Page title="Account" subtitle="test">
@@ -224,7 +232,7 @@
                 <Segment background="image-alt">
                     <div class="info">
                         <span class="label">Account Value</span>
-                        <span class="amount"> ??? </span>
+                        <span class="amount">{$totalUsdValue} </span>
                         <span class="symbol">USD</span>
                     </div>
                     <div class="icon">$</div>

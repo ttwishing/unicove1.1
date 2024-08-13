@@ -20,9 +20,10 @@ import { wharf } from "../wharf";
 import { WharfService } from "../wharf";
 import { configs } from "./network-provider";
 
-import { DelegatedBandwidth } from "$lib/app/abi-types";
+import { DelegatedBandwidth, DelphiOraclePair, DelphiOracleDatapoint } from "$lib/app/abi-types";
 import { REXState } from "@wharfkit/resources";
 import type { Session } from "@wharfkit/session";
+import { Contract } from "@wharfkit/contract";
 
 import { fetchLightApiBalances } from "./balance-utils";
 
@@ -77,7 +78,6 @@ export const balances: Readable<Balance[]> = derived([balancesProvider],
 
 async function getBalances(set: (v: any) => void, wharf: WharfService) {
     const features = configs.get(wharf.chainId)!.features
-    console.log("features= ", features)
     if (features.lightapi) {
         getLightApiBalances(set, wharf.chainId, wharf.actor)
     } else if (features.bloks) {
@@ -146,3 +146,67 @@ export const getREXState = async (set: (v: any) => void, wharf: WharfService, ac
             })
     })
 }
+
+
+export const priceTicker: Readable<number> = derived(
+    [wharf],
+    ([$wharf], set) => {
+        if ($wharf && configs.get($wharf.chainId)?.features.delphioracle) {
+            getPriceTicker(set, $wharf)
+        } else {
+            set(0)
+        }
+    },
+);
+
+const getPriceTicker = async (set: (v: any) => void, wharf: WharfService, pairName?: string) => {
+    let start = Date.now()
+    wharf.getDelphiOracleContract().then(result => {
+        // console.log("contract_cost = ", (Date.now() - start))
+        start = Date.now()
+        getDataPoint(result, wharf, pairName).then(reuslt => {
+            // console.log("api_cost = ", (Date.now() - start))
+            set(result)
+        }).catch(error => {
+            // console.log("api_error = ", error)
+            set(0)
+        })
+    }).catch(error => {
+        // console.log("contract_error = ", error)
+        set(0);
+    })
+    // console.log("cost = ", (Date.now() - start))
+}
+
+async function getDataPoint(contract: Contract, wharf: WharfService, pairName?: string) {
+    //getOraclePairs
+    const pairs: DelphiOraclePair[] = await contract.table("pairs", "delphioracle", DelphiOraclePair).all()
+    let pairLatest = pairs[0]
+    if (!pairLatest) {
+        throw new Error(`No pair for ${pairName} on ${wharf.chainId}`)
+    }
+    let pair: DelphiOraclePair | undefined
+    if (!pairName) {
+        pair = pairs.find(
+            (p) => p.base_symbol.equals(wharf.coreTokenSymbol) && p.quote_symbol.name === 'USD'
+        )
+    } else {
+        pair = pairs.find((p) => p.name.equals(pairName))
+    }
+
+    if (!pair)
+        throw new Error(`No pair for ${pairName} on ${wharf.chainId}`)
+
+    const resPairName = pair.name;
+    console.log("resPairName = ", resPairName)
+    const datapoint: DelphiOracleDatapoint = await contract.table("datapoints", resPairName, DelphiOracleDatapoint).get();
+    if (!datapoint) {
+        throw new Error(`No datapoint for ${pairName} on ${wharf.chainId}`)
+    }
+    console.log("median = ", datapoint.median.toNumber())
+    console.log("quoted_precision = ", pair.quoted_precision.toNumber())
+    const result = datapoint.median.toNumber() / Math.pow(10, pair.quoted_precision.toNumber())
+    console.log("result = ", result)
+    return result;
+}
+

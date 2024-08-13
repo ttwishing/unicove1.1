@@ -4,7 +4,7 @@ import { Name, Asset } from "@wharfkit/antelope"
 
 
 export async function fetchLightApiBalances(chaindId: string, account: Name): Promise<Balance[]> {
-    const data = await fetchData(chaindId, account)
+    // const data = await fetchData(chaindId, account)
     //tudo: parse balances
     return []
 }
@@ -19,10 +19,11 @@ async function fetchData(chaindId: string, account: Name) {
     console.log("apiUrl = ", apiUrl)
     return await fetch(apiUrl)
         .then((result) => {
-            console.log("#################result:", result)
+            console.log("balance-utils#################result:", result)
             return result
         })
         .catch((error) => {
+            console.log("balance-utils#################error:", error)
             console.warn('An error occured while fetching token balances:', { error })
             return []
         })

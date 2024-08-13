@@ -22,7 +22,6 @@
     const hasPowerUp: Readable<boolean> = derived(
         activeChainFeatures,
         ($activeChainFeatures) => {
-            console.log("activeChainFeatures = ", $activeChainFeatures);
             if ($activeChainFeatures && $activeChainFeatures.features.powerup) {
                 return true;
             }
