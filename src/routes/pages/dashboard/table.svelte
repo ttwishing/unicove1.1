@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Asset } from "@wharfkit/antelope";
+    import { Asset, Name } from "@wharfkit/antelope";
     import { derived, readable } from "svelte/store";
     import type { Readable } from "svelte/store";
     import TokenHeaderRow from "./headerrow.svelte";
@@ -18,24 +18,13 @@
      */
     const records: Readable<Balance[]> = readable([]);
 
-    // /**
-    //  * systemToken
-    //  */
-    // const systemTokenBalance: Readable<Balance | undefined> = derived(
-    //     [activeSession, coreTokenBalance],
-    //     ([$activeSession, $coreTokenBalance]) => {
-    //         if ($activeSession && $coreTokenBalance) {
-    //             return $coreTokenBalance;
-    //         }
-    //     },
-    // );
-
     const rexBalance: Readable<Balance | undefined> = derived(
         [wharf, rexTokens, systemToken],
         ([$wharf, $rexTokens, $systemToken]) => {
             if ($wharf && $rexTokens && $systemToken) {
                 return {
                     quantity: Asset.from($rexTokens, $systemToken.symbol),
+                    contract: Name.from($systemToken.contract),
                 };
             }
         },
@@ -47,6 +36,7 @@
             if ($wharf && $delegatedTokens && $systemToken) {
                 return {
                     quantity: Asset.from($delegatedTokens, $systemToken.symbol),
+                    contract: Name.from($systemToken.contract),
                 };
             }
         },

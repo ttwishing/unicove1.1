@@ -27,7 +27,12 @@ import { Contract } from "@wharfkit/contract";
 
 export interface Balance {
     quantity: Asset,
-    contractAccount: Name,
+    contract: Name,
+}
+
+export interface BalancePrice {
+    contract: Name,
+    price: number,
 }
 
 export const systemTokenBalance: Readable<Balance | undefined> = derived(
@@ -39,7 +44,7 @@ export const systemTokenBalance: Readable<Balance | undefined> = derived(
             if (!coreBalance) {
                 coreBalance = Asset.from(0, $currentAccount.systemToken)
             }
-            set({ quantity: coreBalance, contractAccount: $currentAccount.systemContract.account })
+            set({ quantity: coreBalance, contract: $currentAccount.token.contract.account })
         }
     }
 )
@@ -74,6 +79,28 @@ const balancesProvider: Writable<Balance[]> = writable([], (set) => {
 export const balances: Readable<Balance[]> = derived([balancesProvider],
     ([$balancesProvider]) => $balancesProvider
 )
+
+export const balancePrices: Readable<BalancePrice[]> = derived([balances], ([$balances]) => {
+    const prices: BalancePrice[] = []
+    console.log("start.....", prices)
+    if (get(wharf) && $balances && $balances.length > 0) {
+        for (const balance of $balances) {
+            console.log("balancePricesProvider, balance = ", balance)
+            loadPriceTicker("balancePrices", (v) => {
+                const balancePrice = {
+                    contract: balance.contract,
+                    price: v
+                }
+                console.log("push..", balancePrice)
+                prices.push(balancePrice)
+            }, get(wharf)!, balance.quantity.symbol.name.toLowerCase() + "usd")
+        }
+    }
+    console.log("end.....", prices)
+    return prices;
+})
+
+
 
 export const getLightApiBalances = async (set: (v: any) => void, chindName: string, actor: Name) => {
     fetchLightApiBalances(chindName, actor).then((result) => {
@@ -138,7 +165,6 @@ export const getREXState = async (set: (v: any) => void, wharf: WharfService, ac
             .then((result) => {
                 set(result);
             }).catch((err) => {
-                console.log("####error: ", err)
                 console.warn("Error retrieving REXState", err);
                 set(undefined);
             })
@@ -150,21 +176,21 @@ export const priceTicker: Readable<number> = derived(
     [wharf],
     ([$wharf], set) => {
         if ($wharf && configs.get($wharf.chainId)?.features.delphioracle) {
-            getPriceTicker(set, $wharf)
+            loadPriceTicker("priceTicker", set, $wharf)
         } else {
             set(0)
         }
     },
 );
 
-const getPriceTicker = async (set: (v: any) => void, wharf: WharfService, pairName?: string) => {
+export const loadPriceTicker = async (portal: string, set: (v: any) => void, wharf: WharfService, pairName?: string) => {
     let start = Date.now()
     wharf.getDelphiOracleContract().then(result => {
         // console.log("contract_cost = ", (Date.now() - start))
         start = Date.now()
-        getDataPoint(result, wharf, pairName).then(reuslt => {
+        getDataPoint(portal, result, wharf, pairName).then(price => {
             // console.log("api_cost = ", (Date.now() - start))
-            set(result)
+            set(price)
         }).catch(error => {
             // console.log("api_error = ", error)
             set(0)
@@ -176,7 +202,8 @@ const getPriceTicker = async (set: (v: any) => void, wharf: WharfService, pairNa
     // console.log("cost = ", (Date.now() - start))
 }
 
-async function getDataPoint(contract: Contract, wharf: WharfService, pairName?: string) {
+async function getDataPoint(portal: string, contract: Contract, wharf: WharfService, pairName?: string): Promise<number> {
+    console.log("getDataPoint========================", portal, pairName)
     //getOraclePairs
     const pairs: DelphiOraclePair[] = await contract.table("pairs", "delphioracle", DelphiOraclePair).all()
     let pairLatest = pairs[0]
@@ -233,7 +260,8 @@ async function fetchLightApiBalances(chainName: string, account: Name): Promise<
     })
     return balances
         .filter((balance) => {
-            return balance.amount && Number(balance.amount) !== 0
+            //return balance.amount && Number(balance.amount) !== 0
+            return true;
         })
         .map((balance) => {
             const symbol: Asset.Symbol = Asset.Symbol.from(
@@ -242,7 +270,7 @@ async function fetchLightApiBalances(chainName: string, account: Name): Promise<
             const amount = balance.amount ? Number(balance.amount) : 0
             const asset = Asset.from(amount, symbol)
             const record: Balance = {
-                contractAccount: Name.from(balance.contract),
+                contract: Name.from(balance.contract),
                 quantity: asset,
             }
             return record

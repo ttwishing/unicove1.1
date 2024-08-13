@@ -11,7 +11,10 @@
     import TokenImage from "$lib/components/elements/image/token.svelte";
 
     import Number from "./number.svelte";
+
     import { systemToken } from "$lib/wharfkit/tokens";
+    import type { BalancePrice } from "$lib/wharfkit/stores/balance-provider";
+    import { balancePrices } from "$lib/wharfkit/stores/balance-provider";
 
     export let balance: Balance;
     export let name: string = "";
@@ -23,6 +26,12 @@
         systemToken,
         ($systemToken) => $systemToken,
     );
+
+    const balancePrice = derived(balancePrices, ($balancePrices) => {
+        return $balancePrices.find((price) =>
+            price.contract.equals(balance.contract),
+        );
+    });
 
     const url: string | undefined = undefined;
 
@@ -62,13 +71,16 @@
                 <Number asset={balance.quantity} />
             {/if}
             <div class="price">
-                {#if $token.price}
-                    {fiatFormat($token.price, 4)}
+                {#if $balancePrice && $balancePrice.price}
+                    {fiatFormat($balancePrice.price, 4)}
                 {/if}
             </div>
             <div class="value">
-                {#if $token.price}
-                    {fiatFormat($token.price * balance.quantity.value, 2)}
+                {#if $balancePrice && $balancePrice.price}
+                    {fiatFormat(
+                        $balancePrice.price * balance.quantity.value,
+                        2,
+                    )}
                 {/if}
             </div>
             <div class="controls">

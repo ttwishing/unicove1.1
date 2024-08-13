@@ -43,33 +43,36 @@
     const rexTokens: Readable<number> = derived(
         [currentAccount, stateREX, systemToken],
         ([$currentAccount, $stateREX, $systemToken]) => {
-            if (
-                $currentAccount &&
-                $currentAccount.data.rex_info &&
-                $stateREX &&
-                $stateREX.value
-            ) {
-                if ($stateREX.value === 0.0001) {
-                    const pool = $stateREX;
-                    if (!$systemToken || !pool) {
-                        return 0;
+            try {
+                if (
+                    $currentAccount &&
+                    $currentAccount.data.rex_info &&
+                    $stateREX &&
+                    $stateREX.value
+                ) {
+                    if ($stateREX.value === 0.0001) {
+                        const pool = $stateREX;
+                        if (!$systemToken || !pool) {
+                            return 0;
+                        }
+                        const { total_lendable, total_rex } = pool;
+                        const R1 = total_rex.units.adding(
+                            $currentAccount.data.rex_info.rex_balance.units,
+                        );
+                        const S1 = Int128.from(R1)
+                            .multiplying(total_lendable.units)
+                            .dividing(total_rex.units);
+                        const result = S1.subtracting(total_lendable.units);
+                        return Asset.fromUnits(result, $systemToken!.symbol)
+                            .value;
+                    } else {
+                        return (
+                            $stateREX.value *
+                            $currentAccount.data.rex_info.rex_balance.value
+                        );
                     }
-                    const { total_lendable, total_rex } = pool;
-                    const R1 = total_rex.units.adding(
-                        $currentAccount.data.rex_info.rex_balance.units,
-                    );
-                    const S1 = Int128.from(R1)
-                        .multiplying(total_lendable.units)
-                        .dividing(total_rex.units);
-                    const result = S1.subtracting(total_lendable.units);
-                    return Asset.fromUnits(result, $systemToken!.symbol).value;
-                } else {
-                    return (
-                        $stateREX.value *
-                        $currentAccount.data.rex_info.rex_balance.value
-                    );
                 }
-            }
+            } catch (error) {}
             return 0;
         },
     );
@@ -92,13 +95,16 @@
      * balance value
      */
     const balancesTokens: Readable<number> = derived(
-        [balances],
-        ([$balances]) => {
+        [currentAccount, balances],
+        ([$currentAccount, $balances]) => {
             let balance = 0;
-            if ($balances) {
+            if ($balances && $currentAccount) {
                 $balances
-                    // todo, check tokenKey?
-                    // .filter(true)
+                    .filter((record) =>
+                        record.contract.equals(
+                            $currentAccount.token.contract.account,
+                        ),
+                    )
                     .map((record) => {
                         balance += record.quantity.value;
                     });
