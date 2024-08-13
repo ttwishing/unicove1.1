@@ -115,8 +115,20 @@
      * cal by balanceValue, rexValue, stakedValue
      */
     const totalSystemTokens: Readable<Asset | undefined> = derived(
-        [sytemTokens, balancesTokens, delegatedTokens, rexTokens],
-        ([$sytemTokens, $balancesTokens, $delegated, $rex]) => {
+        [
+            currentAccount,
+            sytemTokens,
+            balancesTokens,
+            delegatedTokens,
+            rexTokens,
+        ],
+        ([
+            $currentAccount,
+            $sytemTokens,
+            $balancesTokens,
+            $delegated,
+            $rex,
+        ]) => {
             if ($currentAccount) {
                 let amount = 0;
                 //core token

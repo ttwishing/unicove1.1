@@ -81,25 +81,8 @@ export const balances: Readable<Balance[]> = derived([balancesProvider],
 )
 
 export const balancePrices: Readable<BalancePrice[]> = derived([balances], ([$balances]) => {
-    const prices: BalancePrice[] = []
-    // console.log("start.....", prices)
-    if (get(wharf) && $balances && $balances.length > 0) {
-        for (const balance of $balances) {
-            // console.log("balancePricesProvider, balance = ", balance)
-            loadPriceTicker("balancePrices", (v) => {
-                const balancePrice = {
-                    contract: balance.contract,
-                    price: v
-                }
-                // console.log("push..", balancePrice)
-                prices.push(balancePrice)
-            }, get(wharf)!, balance.quantity.symbol.name.toLowerCase() + "usd")
-        }
-    }
-    // console.log("end.....", prices)
-    return prices;
+    return []
 })
-
 
 
 export const getLightApiBalances = async (set: (v: any) => void, chindName: string, actor: Name) => {
@@ -184,6 +167,10 @@ export const priceTicker: Readable<number> = derived(
 );
 
 export const loadPriceTicker = async (portal: string, set: (v: any) => void, wharf: WharfService, pairName?: string) => {
+    if (!configs.get(wharf.chainId)?.features.delphioracle) {
+        set(0);
+        return;
+    }
     let start = Date.now()
     wharf.getDelphiOracleContract().then(result => {
         // console.log("contract_cost = ", (Date.now() - start))
