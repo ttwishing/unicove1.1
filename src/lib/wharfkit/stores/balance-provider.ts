@@ -82,21 +82,21 @@ export const balances: Readable<Balance[]> = derived([balancesProvider],
 
 export const balancePrices: Readable<BalancePrice[]> = derived([balances], ([$balances]) => {
     const prices: BalancePrice[] = []
-    console.log("start.....", prices)
+    // console.log("start.....", prices)
     if (get(wharf) && $balances && $balances.length > 0) {
         for (const balance of $balances) {
-            console.log("balancePricesProvider, balance = ", balance)
+            // console.log("balancePricesProvider, balance = ", balance)
             loadPriceTicker("balancePrices", (v) => {
                 const balancePrice = {
                     contract: balance.contract,
                     price: v
                 }
-                console.log("push..", balancePrice)
+                // console.log("push..", balancePrice)
                 prices.push(balancePrice)
             }, get(wharf)!, balance.quantity.symbol.name.toLowerCase() + "usd")
         }
     }
-    console.log("end.....", prices)
+    // console.log("end.....", prices)
     return prices;
 })
 
@@ -163,7 +163,6 @@ export const getREXState = async (set: (v: any) => void, wharf: WharfService, ac
     wharf.getSystemContract().then((contract) => {
         contract.table("rexpool", "eosio", REXState).get()
             .then((result) => {
-                console.log("getREXState.................", String(actor))
                 set(result);
             }).catch((err) => {
                 console.warn("Error retrieving REXState", err);
@@ -204,7 +203,7 @@ export const loadPriceTicker = async (portal: string, set: (v: any) => void, wha
 }
 
 async function getDataPoint(portal: string, contract: Contract, wharf: WharfService, pairName?: string): Promise<number> {
-    console.log("getDataPoint========================", portal, pairName)
+    // console.log("getDataPoint========================", portal, pairName)
     //getOraclePairs
     const pairs: DelphiOraclePair[] = await contract.table("pairs", "delphioracle", DelphiOraclePair).all()
     let pairLatest = pairs[0]
@@ -224,14 +223,14 @@ async function getDataPoint(portal: string, contract: Contract, wharf: WharfServ
         throw new Error(`No pair for ${pairName} on ${wharf.chainId}`)
 
     const resPairName = pair.name;  //eosusd
-    console.log("resPairName = ", String(resPairName))
+    // console.log("resPairName = ", String(resPairName))
     const datapoint: DelphiOracleDatapoint = await contract.table("datapoints", resPairName, DelphiOracleDatapoint).get();
     if (!datapoint) {
         throw new Error(`No datapoint for ${pairName} on ${wharf.chainId}`)
     }
 
     const result = datapoint.median.toNumber() / Math.pow(10, pair.quoted_precision.toNumber())
-    console.log("result = ", result)
+    // console.log("result = ", result)
     return result;
 }
 

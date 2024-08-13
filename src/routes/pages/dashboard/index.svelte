@@ -43,39 +43,35 @@
     const rexTokens: Readable<number> = derived(
         [currentAccount, stateREX, systemToken],
         ([$currentAccount, $stateREX, $systemToken]) => {
-            try {
-                if (
-                    $currentAccount &&
-                    $currentAccount.data.rex_info &&
-                    $stateREX &&
-                    $stateREX.value
-                ) {
-                    console.log("########enter");
-                    if ($stateREX.value === 0.0001) {
-                        const pool = $stateREX;
-                        if (!$systemToken || !pool) {
-                            return 0;
-                        }
-                        const { total_lendable, total_rex } = pool;
-                        const R1 = total_rex.units.adding(
-                            $currentAccount.data.rex_info.rex_balance.units,
-                        );
-                        const S1 = Int128.from(R1)
-                            .multiplying(total_lendable.units)
-                            .dividing(total_rex.units);
-                        const result = S1.subtracting(total_lendable.units);
-                        return Asset.fromUnits(result, $systemToken!.symbol)
-                            .value;
-                    } else {
-                        return (
-                            $stateREX.value *
-                            $currentAccount.data.rex_info.rex_balance.value
-                        );
+            if (
+                $currentAccount &&
+                $currentAccount.data.rex_info &&
+                $stateREX &&
+                $stateREX.value
+            ) {
+                console.log("########enter");
+                if ($stateREX.value === 0.0001) {
+                    const pool = $stateREX;
+                    if (!$systemToken || !pool) {
+                        return 0;
                     }
+                    const { total_lendable, total_rex } = pool;
+                    const R1 = total_rex.units.adding(
+                        $currentAccount.data.rex_info.rex_balance.units,
+                    );
+                    const S1 = Int128.from(R1)
+                        .multiplying(total_lendable.units)
+                        .dividing(total_rex.units);
+                    const result = S1.subtracting(total_lendable.units);
+                    return Asset.fromUnits(result, $systemToken!.symbol).value;
+                } else {
+                    return (
+                        $stateREX.value *
+                        $currentAccount.data.rex_info.rex_balance.value
+                    );
                 }
-            } catch (error) {
-                console.log("###################Error", error);
             }
+
             return 0;
         },
     );
