@@ -17,9 +17,9 @@ export const currentAccount: Readable<Account | undefined> = derived(
     ($accountProvider) => $accountProvider.account
 )
 
-currentAccount.subscribe(value => {
-    console.log("currentAccount = ", value)
-})
+// currentAccount.subscribe(value => {
+//     console.log("currentAccount = ", value)
+// })
 
 export const activeChainFeatures: Readable<ChainConfig | undefined> = derived(wharf, ($wharf) => {
     if ($wharf) {
