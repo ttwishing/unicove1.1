@@ -52,6 +52,7 @@ export class WharfService {
         this.chainId = String(this.chain.id)
         this.chainName = configs.get(this.chainId)!.name
         this.coreTokenSymbol = configs.get(this.chainId)?.symbol || '4,EOS'
+        console.log("#####", this.chain.url)
         this.client = new APIClient({ url: this.chain.url })
         this.accountKit = new AccountKit(this.chain, { client: this.client })
         this.contractKit = new ContractKit({ client: this.client })

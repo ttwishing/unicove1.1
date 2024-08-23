@@ -13,7 +13,7 @@ import { derived } from "svelte/store";
 import { get } from "svelte/store";
 import { readable, writable } from "svelte/store";
 
-import { Name } from "@wharfkit/antelope";
+import { APIClient, Name } from "@wharfkit/antelope";
 import { Asset } from "@wharfkit/antelope";
 import { currentAccount } from "../store";
 import { wharf } from "../wharf";
@@ -22,8 +22,11 @@ import { configs } from "./network-provider";
 
 import { DelegatedBandwidth, DelphiOraclePair, DelphiOracleDatapoint } from "$lib/app/abi-types";
 import { REXState } from "@wharfkit/resources";
+import { REXState as REXStateTest } from "./types";
 import type { Session } from "@wharfkit/session";
 import { Contract } from "@wharfkit/contract";
+
+// import { APIClient as TestApiClient } from "$lib/antelope";
 
 export interface Balance {
     quantity: Asset,
@@ -144,14 +147,39 @@ export const stateREX: Readable<REXState | undefined> = derived(
 
 export const getREXState = async (set: (v: any) => void, wharf: WharfService, actor: Name) => {
     wharf.getSystemContract().then((contract) => {
-        contract.table("rexpool", "eosio", REXState).get()
+        contract.table("rexpool", "eosio", REXStateTest).get()
             .then((result) => {
+                console.log("result_0", result);
                 set(result);
             }).catch((err) => {
                 console.warn("Error retrieving REXState", err);
                 set(undefined);
             })
     })
+
+    // wharf.getSystemContract().then((contract) => {
+    //     contract.table("rexbal", actor, REXState).get()
+    //         .then((result) => {
+    //             console.warn("result", result);
+    //             set(result);
+    //         }).catch((err) => {
+    //             console.warn("Error retrieving REXState", err);
+    //             set(undefined);
+    //         })
+    // })
+
+    // const client = new APIClient({ url: this.chain.url })
+
+    // wharf.client.v1.chain.get_table_rows({
+    //     code: 'eosio',
+    //     scope: 'eosio',
+    //     table: 'rexpool',
+    //     type: REXState,
+    // }).then((result) => {
+    //     console.log("result_1", result);
+    // }).catch((err) => {
+    //     console.warn("Error retrieving REXState", err);
+    // })
 }
 
 

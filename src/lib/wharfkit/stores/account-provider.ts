@@ -137,6 +137,7 @@ export async function loadAccount(
     // do refresh
     if (stale || refresh) {
         const account: Account = await get(wharf)!.accountKit.load(name)
+        console.log("account: ", account)
         // const accountObj = account.data
         // await storeAccount(accountObj, chainId)
         console.log("account.accountName", String(account.accountName))
